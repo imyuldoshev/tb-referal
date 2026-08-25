@@ -12,7 +12,7 @@ export default function Login({ onLogin }) {
     const CORRECT_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'admin123';
     
     if (password === CORRECT_PASSWORD) {
-      localStorage.setItem('is_admin_authenticated', 'true');
+      localStorage.setItem('admin_auth_time', Date.now().toString());
       onLogin();
     } else {
       setError("Noto'g'ri parol kiritdingiz!");

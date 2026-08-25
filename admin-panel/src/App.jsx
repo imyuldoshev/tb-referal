@@ -50,21 +50,55 @@ function Sidebar({ onLogout }) {
   );
 }
 
+const SESSION_DURATION = 30 * 60 * 1000; // 30 daqiqa (millisoniyalarda)
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
-    // Sahifa yangilanganda xotirani tekshiramiz
-    const auth = localStorage.getItem('is_admin_authenticated');
-    if (auth === 'true') {
-      setIsAuthenticated(true);
-    }
-  }, []);
-
   const handleLogout = () => {
-    localStorage.removeItem('is_admin_authenticated');
+    localStorage.removeItem('admin_auth_time');
     setIsAuthenticated(false);
   };
+
+  const checkAuth = () => {
+    const authTime = localStorage.getItem('admin_auth_time');
+    if (authTime) {
+      // Hozirgi vaqtdan login qilingan vaqtni ayirib tekshiramiz
+      if (Date.now() - parseInt(authTime) < SESSION_DURATION) {
+        setIsAuthenticated(true);
+        return;
+      }
+    }
+    // Agar vaqt tugagan bo'lsa yoki umuman kirmagan bo'lsa
+    handleLogout();
+  };
+
+  useEffect(() => {
+    checkAuth(); // Dastlabki yuklanishda tekshiradi
+
+    // Har 1 daqiqada vaqt tugagan yoki yo'qligini orqa fonda tekshirib turadi
+    const interval = setInterval(() => {
+      checkAuth();
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    // Agar foydalanuvchi ekranni bossa yoki klaviaturadan nimadir yozsa (faol bo'lsa), vaqtni yana 30 daqiqaga uzaytiramiz
+    const updateActivity = () => {
+      if (isAuthenticated) {
+        localStorage.setItem('admin_auth_time', Date.now().toString());
+      }
+    };
+    window.addEventListener('click', updateActivity);
+    window.addEventListener('keydown', updateActivity);
+    
+    return () => {
+      window.removeEventListener('click', updateActivity);
+      window.removeEventListener('keydown', updateActivity);
+    };
+  }, [isAuthenticated]);
 
   if (!isAuthenticated) {
     return <Login onLogin={() => setIsAuthenticated(true)} />;
