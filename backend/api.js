@@ -122,6 +122,32 @@ router.get('/students/:id/invited', async (req, res) => {
     res.json(data);
 });
 
+// POST /api/students/:id/enroll - O'quvchiga yangi kurs qoshish
+router.post('/students/:id/enroll', async (req, res) => {
+    const { id } = req.params;
+    const { course_id } = req.body;
+    
+    // Avval bu kursga qo'shilganini tekshiramiz
+    const { data: existing } = await supabase
+        .from('student_courses')
+        .select('*')
+        .eq('student_id', id)
+        .eq('course_id', course_id)
+        .single();
+        
+    if (existing) {
+        return res.status(400).json({ error: "O'quvchi bu kursga allaqachon qo'shilgan!" });
+    }
+
+    const { data, error } = await supabase
+        .from('student_courses')
+        .insert([{ student_id: id, course_id }])
+        .select();
+        
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+});
+
 // DELETE /api/students/:id - O'quvchini o'chirish
 router.delete('/students/:id', async (req, res) => {
     const { id } = req.params;

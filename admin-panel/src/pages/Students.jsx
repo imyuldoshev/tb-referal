@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
-import { Search, Trash2, Edit2, X, Eye, AlertTriangle, Book } from 'lucide-react';
+import { Search, Trash2, Edit2, X, Eye, AlertTriangle, Book, PlusCircle } from 'lucide-react';
 
 export default function Students() {
   const [students, setStudents] = useState([]);
@@ -18,6 +18,9 @@ export default function Students() {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [invitedList, setInvitedList] = useState([]);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+
+  // Kursga qo'shish (Enroll) Modali
+  const [enrollData, setEnrollData] = useState(null); 
 
   const fetchData = async () => {
     try {
@@ -78,6 +81,47 @@ export default function Students() {
       setIsViewModalOpen(true);
     } catch (err) {
       alert("Taklif qilinganlarni yuklashda xatolik: " + err.message);
+    }
+  };
+
+  const handleEnrollClick = async (student, courseId) => {
+    if (!courseId) return;
+    const course = courses.find(c => c.id === courseId);
+    
+    try {
+      // O'quvchi nechta odam taklif qilganini tekshiramiz (skidka hisoblash uchun)
+      const res = await api.get(`/students/${student.id}/invited`);
+      const invites = res.data;
+      const activeCount = invites.filter(i => i.status === 'active').length;
+      
+      // Har bir faol taklif uchun 5% skidka (masalan maksimal 100%)
+      const rawDiscountPercent = activeCount * 5;
+      const discountPercent = rawDiscountPercent > 100 ? 100 : rawDiscountPercent;
+      
+      const discountAmount = (course.price * discountPercent) / 100;
+      const finalPrice = course.price - discountAmount;
+      
+      setEnrollData({
+        student,
+        course,
+        activeCount,
+        discountPercent,
+        basePrice: course.price,
+        finalPrice
+      });
+    } catch (err) {
+      alert("Skidkani hisoblashda xatolik: " + err.message);
+    }
+  };
+
+  const confirmEnroll = async () => {
+    try {
+      await api.post(`/students/${enrollData.student.id}/enroll`, { course_id: enrollData.course.id });
+      setEnrollData(null);
+      fetchData();
+    } catch (err) {
+      alert(err.response?.data?.error || "Xatolik: " + err.message);
+      setEnrollData(null); // xato bo'lsa ham modalni yopamiz (masalan allaqachon qo'shilgan bo'lsa)
     }
   };
 
@@ -165,17 +209,25 @@ export default function Students() {
                       <p className="text-sm text-gray-500">{student.phone || student.telegram_id}</p>
                     </td>
                     <td className="p-4">
-                      {courseNames.length > 0 ? (
-                        <div className="flex flex-wrap gap-1">
+                      {courseNames.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-2">
                           {courseNames.map((cName, i) => (
                             <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-md border border-blue-100">
                               <Book size={12} /> {cName}
                             </span>
                           ))}
                         </div>
-                      ) : (
-                        <span className="text-gray-400 text-sm italic">Kurs belgilanmagan</span>
                       )}
+                      <select 
+                        className="border border-gray-300 rounded p-1 outline-none text-xs bg-gray-50 w-full hover:border-blue-400 transition-colors"
+                        value="" // Doim bo'sh turadi, chunki bu faqat harakat (action)
+                        onChange={(e) => handleEnrollClick(student, e.target.value)}
+                      >
+                        <option value="">+ Kursga qo'shish...</option>
+                        {courses.map(c => (
+                          <option key={c.id} value={c.id}>{c.title}</option>
+                        ))}
+                      </select>
                     </td>
                     <td className="p-4">
                       {refInfo ? (
@@ -233,6 +285,72 @@ export default function Students() {
       </div>
 
       {/* --- MODALS --- */}
+
+      {/* Kursga qo'shish (Enroll) Modali va Skidka hisoblash */}
+      {enrollData && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-md">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                  <PlusCircle size={24} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900">Kursga qo'shish</h3>
+                  <p className="text-sm text-gray-500">To'lov va chegirma hisob-kitobi</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-gray-600">O'quvchi:</span>
+                  <span className="font-medium text-gray-900">{enrollData.student.full_name}</span>
+                </div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-gray-600">Tanlangan kurs:</span>
+                  <span className="font-medium text-blue-600">{enrollData.course.title}</span>
+                </div>
+                <div className="flex justify-between text-sm pt-2 border-t border-gray-200">
+                  <span className="text-gray-600">Faol takliflari (odam):</span>
+                  <span className="font-bold text-gray-900">{enrollData.activeCount} ta</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Kursning asl narxi:</span>
+                  <span className="text-gray-500 line-through">{enrollData.basePrice.toLocaleString()} so'm</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-green-600 font-medium">Takliflar uchun chegirma:</span>
+                  <span className="text-green-600 font-bold">-{enrollData.discountPercent}%</span>
+                </div>
+                <div className="flex justify-between text-lg pt-3 border-t border-gray-200">
+                  <span className="font-bold text-gray-900">To'lashi kerak:</span>
+                  <span className="font-bold text-blue-600">{enrollData.finalPrice.toLocaleString()} so'm</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 border-t border-gray-200 flex gap-3 justify-end bg-gray-50 rounded-b-xl">
+              <button 
+                onClick={() => setEnrollData(null)}
+                className="px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+              >
+                Bekor qilish
+              </button>
+              <button 
+                onClick={confirmEnroll}
+                className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 font-medium transition-colors"
+              >
+                Tasdiqlash va Qo'shish
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Ko'rish (View/Invites) Modali */}
       {isViewModalOpen && selectedStudent && (
