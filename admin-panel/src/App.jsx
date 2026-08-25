@@ -1,10 +1,12 @@
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import Courses from './pages/Courses';
 import Students from './pages/Students';
-import { LayoutDashboard, BookOpen, Users } from 'lucide-react';
+import Login from './pages/Login';
+import { LayoutDashboard, BookOpen, Users, LogOut } from 'lucide-react';
 
-function Sidebar() {
+function Sidebar({ onLogout }) {
   const location = useLocation();
 
   const links = [
@@ -35,15 +37,43 @@ function Sidebar() {
           </Link>
         ))}
       </nav>
+      <div className="p-4 border-t border-gray-200">
+        <button 
+          onClick={onLogout}
+          className="flex w-full items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
+        >
+          <LogOut size={20} />
+          Chiqish
+        </button>
+      </div>
     </div>
   );
 }
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Sahifa yangilanganda xotirani tekshiramiz
+    const auth = localStorage.getItem('is_admin_authenticated');
+    if (auth === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('is_admin_authenticated');
+    setIsAuthenticated(false);
+  };
+
+  if (!isAuthenticated) {
+    return <Login onLogin={() => setIsAuthenticated(true)} />;
+  }
+
   return (
     <BrowserRouter>
       <div className="flex bg-gray-50 min-h-screen">
-        <Sidebar />
+        <Sidebar onLogout={handleLogout} />
         <div className="flex-1 ml-64 p-8">
           <Routes>
             <Route path="/" element={<Dashboard />} />
