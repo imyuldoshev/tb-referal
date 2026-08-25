@@ -163,9 +163,8 @@ router.delete('/students/:id', async (req, res) => {
 // PATCH /api/referrals/:id - Referal statusini o'zgartirish (va kursga biriktirish)
 router.patch('/referrals/:id', async (req, res) => {
     const { id } = req.params;
-    const { status, course_id } = req.body; 
+    const { status, course_id } = req.body;
     
-    // Status va kursni yangilash
     let updateData = { status };
     if (course_id) updateData.course_id = course_id;
 
@@ -173,31 +172,46 @@ router.patch('/referrals/:id', async (req, res) => {
         .from('referrals')
         .update(updateData)
         .eq('id', id)
-        .select(`
-            *,
-            inviter:students!referrals_inviter_id_fkey(telegram_id),
-            referee:students!referrals_referee_id_fkey(full_name)
-        `)
+        .select('*, inviter:students!referrals_inviter_id_fkey(telegram_id), referee:students!referrals_referee_id_fkey(full_name)')
         .single();
         
     if (error) return res.status(500).json({ error: error.message });
 
-    // Agar muvaffaqiyatli o'zgarsa, taklif qilgan odamga xabar yuborish
-    if (data && data.inviter && data.inviter.telegram_id) {
+    // Agar status "active" ga o'zgarsa, taklif qilgan odamga telegramdan jami skidkasini hisoblab yuboramiz
+    if (status === 'active' && data.inviter?.telegram_id) {
         try {
-            if (status === 'active') {
-                await bot.api.sendMessage(
-                    data.inviter.telegram_id, 
-                    `🎉 Tabriklaymiz! Do'stingiz **${data.referee.full_name}** o'qishni boshladi va u uchun sizga chegirma qo'shildi!`, 
-                    { parse_mode: 'Markdown' }
-                );
-            } else if (status === 'left') {
-                await bot.api.sendMessage(
-                    data.inviter.telegram_id, 
-                    `⚠️ Do'stingiz **${data.referee.full_name}** o'qishni to'xtatdi. Keyingi oydan sizning chegirmangiz qayta hisoblanadi.`, 
-                    { parse_mode: 'Markdown' }
-                );
-            }
+            // Inviterning barcha aktiv takliflarini sanaymiz
+            const { data: activeReferrals } = await supabase
+                .from('referrals')
+                .select('id')
+                .eq('inviter_id', data.inviter_id)
+                .eq('status', 'active');
+                
+            const activeCount = activeReferrals ? activeReferrals.length : 1;
+            let totalDiscount = activeCount * 5;
+            if (totalDiscount > 100) totalDiscount = 100;
+
+            await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: data.inviter.telegram_id,
+                    text: `🎉 Tabriklaymiz! Siz taklif qilgan ${data.referee.full_name} o'qishni boshladi.\n\nSizning jami chegirmangiz ${totalDiscount}% ga yetdi! (${activeCount} ta faol o'quvchi)`
+                })
+            });
+        } catch (e) {
+            console.error('Bot orqali xabar yuborishda xatolik:', e);
+        }
+    } else if (status === 'left' && data.inviter && data.inviter.telegram_id) {
+        try {
+            await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: data.inviter.telegram_id,
+                    text: `⚠️ Do'stingiz ${data.referee.full_name} o'qishni to'xtatdi. Keyingi oydan sizning chegirmangiz qayta hisoblanadi.`
+                })
+            });
         } catch (botErr) {
             console.error("Telegram xabarini yuborishda xatolik:", botErr);
         }
