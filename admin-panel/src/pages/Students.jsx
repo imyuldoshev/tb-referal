@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
-import { Search, Trash2 } from 'lucide-react';
+import { Search, Trash2, Edit2, X, Check } from 'lucide-react';
 
 export default function Students() {
   const [students, setStudents] = useState([]);
   const [courses, setCourses] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Tahrirlash uchun statelar
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState({ full_name: '', phone: '' });
 
   const fetchData = async () => {
     try {
@@ -38,6 +42,24 @@ export default function Students() {
     if (!window.confirm("Bu o'quvchini va unga tegishli hamma takliflarni butunlay o'chirmoqchimisiz?")) return;
     try {
       await api.delete(`/students/${id}`);
+      fetchData();
+    } catch (err) {
+      alert("Xatolik: " + err.message);
+    }
+  };
+
+  const handleEditClick = (student) => {
+    setEditingId(student.id);
+    setEditForm({ full_name: student.full_name || '', phone: student.phone || '' });
+  };
+
+  const handleSaveEdit = async (id) => {
+    try {
+      await api.patch(`/students/${id}`, {
+        full_name: editForm.full_name,
+        phone: editForm.phone
+      });
+      setEditingId(null);
       fetchData();
     } catch (err) {
       alert("Xatolik: " + err.message);
@@ -84,16 +106,38 @@ export default function Students() {
               <tr><td colSpan="4" className="p-4 text-center text-gray-500">Hech qanday ma'lumot topilmadi</td></tr>
             ) : (
               filteredStudents.map(student => {
-                // Supabase one-to-many relationship returns an array.
                 const refInfo = student.referral_info && student.referral_info.length > 0 
                   ? student.referral_info[0] 
                   : null;
 
+                const isEditing = editingId === student.id;
+
                 return (
                   <tr key={student.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
                     <td className="p-4">
-                      <p className="font-medium">{student.full_name}</p>
-                      <p className="text-sm text-gray-500">{student.phone || student.telegram_id}</p>
+                      {isEditing ? (
+                        <div className="space-y-2">
+                          <input 
+                            type="text"
+                            value={editForm.full_name}
+                            onChange={(e) => setEditForm({...editForm, full_name: e.target.value})}
+                            className="w-full border border-gray-300 rounded p-1 text-sm outline-none"
+                            placeholder="Ism familiya"
+                          />
+                          <input 
+                            type="text"
+                            value={editForm.phone}
+                            onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
+                            className="w-full border border-gray-300 rounded p-1 text-sm outline-none"
+                            placeholder="Telefon raqam"
+                          />
+                        </div>
+                      ) : (
+                        <>
+                          <p className="font-medium">{student.full_name}</p>
+                          <p className="text-sm text-gray-500">{student.phone || student.telegram_id}</p>
+                        </>
+                      )}
                     </td>
                     <td className="p-4">
                       {refInfo ? (
@@ -117,26 +161,47 @@ export default function Students() {
                     </td>
                     <td className="p-4">
                       <div className="flex items-center justify-between">
-                        {refInfo ? (
-                          <select 
-                            className="border border-gray-300 rounded p-1 outline-none text-sm"
-                            value={refInfo.status}
-                            onChange={(e) => handleStatusChange(refInfo.id, e.target.value)}
-                          >
-                            <option value="pending">Kutilmoqda (Pending)</option>
-                            <option value="active">Faol (Active)</option>
-                            <option value="left">Ketdi (Left)</option>
-                          </select>
-                        ) : (
-                          <span></span>
-                        )}
-                        <button 
-                          onClick={() => handleDeleteStudent(student.id)} 
-                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors ml-4"
-                          title="O'quvchini butunlay o'chirish"
-                        >
-                          <Trash2 size={18} />
-                        </button>
+                        {/* Status o'zgartirish (faqat referali borlar uchun) */}
+                        <div className="flex-1">
+                          {refInfo && !isEditing && (
+                            <select 
+                              className="border border-gray-300 rounded p-1 outline-none text-sm"
+                              value={refInfo.status}
+                              onChange={(e) => handleStatusChange(refInfo.id, e.target.value)}
+                            >
+                              <option value="pending">Kutilmoqda (Pending)</option>
+                              <option value="active">Faol (Active)</option>
+                              <option value="left">Ketdi (Left)</option>
+                            </select>
+                          )}
+                        </div>
+
+                        {/* Tahrirlash va O'chirish tugmalari */}
+                        <div className="flex items-center gap-1 ml-4">
+                          {isEditing ? (
+                            <>
+                              <button onClick={() => handleSaveEdit(student.id)} className="p-2 text-green-600 hover:bg-green-50 rounded" title="Saqlash"><Check size={18}/></button>
+                              <button onClick={() => setEditingId(null)} className="p-2 text-gray-400 hover:bg-gray-50 rounded" title="Bekor qilish"><X size={18}/></button>
+                            </>
+                          ) : (
+                            <>
+                              <button 
+                                onClick={() => handleEditClick(student)} 
+                                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                title="O'quvchini tahrirlash"
+                              >
+                                <Edit2 size={18} />
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteStudent(student.id)} 
+                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                title="O'quvchini butunlay o'chirish"
+                              >
+                                <Trash2 size={18} />
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </td>
                   </tr>

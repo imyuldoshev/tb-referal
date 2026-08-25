@@ -89,6 +89,20 @@ router.get('/students_full', async (req, res) => {
     res.json(data);
 });
 
+// PATCH /api/students/:id - O'quvchini tahrirlash
+router.patch('/students/:id', async (req, res) => {
+    const { id } = req.params;
+    const { full_name, phone } = req.body;
+    const { data, error } = await supabase
+        .from('students')
+        .update({ full_name, phone })
+        .eq('id', id)
+        .select();
+        
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+});
+
 // DELETE /api/students/:id - O'quvchini o'chirish
 router.delete('/students/:id', async (req, res) => {
     const { id } = req.params;
