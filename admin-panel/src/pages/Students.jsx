@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
-import { Search, Trash2, Edit2, X, Check } from 'lucide-react';
+import { Search, Trash2, Edit2, X, Check, Eye } from 'lucide-react';
 
 export default function Students() {
   const [students, setStudents] = useState([]);
@@ -10,6 +10,11 @@ export default function Students() {
   // Tahrirlash uchun statelar
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ full_name: '', phone: '' });
+
+  // Modal uchun statelar
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [invitedList, setInvitedList] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -66,6 +71,17 @@ export default function Students() {
     }
   };
 
+  const handleViewInvites = async (student) => {
+    setSelectedStudent(student);
+    try {
+      const res = await api.get(`/students/${student.id}/invited`);
+      setInvitedList(res.data);
+      setIsModalOpen(true);
+    } catch (err) {
+      alert("Taklif qilinganlarni yuklashda xatolik: " + err.message);
+    }
+  };
+
   const filteredStudents = students.filter(s => {
     const term = searchQuery.toLowerCase();
     const name = s.full_name?.toLowerCase() || '';
@@ -73,7 +89,7 @@ export default function Students() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">O'quvchilar va Referallar</h2>
@@ -176,7 +192,7 @@ export default function Students() {
                           )}
                         </div>
 
-                        {/* Tahrirlash va O'chirish tugmalari */}
+                        {/* Tahrirlash, Ko'rish va O'chirish tugmalari */}
                         <div className="flex items-center gap-1 ml-4">
                           {isEditing ? (
                             <>
@@ -185,6 +201,13 @@ export default function Students() {
                             </>
                           ) : (
                             <>
+                              <button 
+                                onClick={() => handleViewInvites(student)} 
+                                className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                                title="Taklif qilgan o'quvchilarini ko'rish"
+                              >
+                                <Eye size={18} />
+                              </button>
                               <button 
                                 onClick={() => handleEditClick(student)} 
                                 className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
@@ -211,6 +234,74 @@ export default function Students() {
           </tbody>
         </table>
       </div>
+
+      {/* Modal - Taklif qilingan o'quvchilar */}
+      {isModalOpen && selectedStudent && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-2xl max-h-[80vh] flex flex-col">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">{selectedStudent.full_name}</h3>
+                <p className="text-sm text-gray-500">Taklif qilgan o'quvchilari va skidkasi</p>
+              </div>
+              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:bg-gray-100 p-2 rounded-lg">
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto">
+              <div className="flex gap-4 mb-6">
+                <div className="bg-blue-50 p-4 rounded-lg flex-1 border border-blue-100">
+                  <p className="text-sm text-blue-600 font-medium mb-1">Jami taklif qilinganlar</p>
+                  <p className="text-2xl font-bold text-blue-900">{invitedList.length} ta</p>
+                </div>
+                <div className="bg-green-50 p-4 rounded-lg flex-1 border border-green-100">
+                  <p className="text-sm text-green-600 font-medium mb-1">Faol o'quvchilar (Skidka %)</p>
+                  <p className="text-2xl font-bold text-green-900">
+                    {invitedList.filter(i => i.status === 'active').length * 5}% chegirma
+                  </p>
+                </div>
+              </div>
+
+              <h4 className="font-bold text-gray-900 mb-4">Taklif qilingan o'quvchilar ro'yxati:</h4>
+              
+              {invitedList.length === 0 ? (
+                <p className="text-gray-500 text-center py-4 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                  Ushbu o'quvchi hali hech kimni taklif qilmagan.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {invitedList.map(invite => (
+                    <div key={invite.id} className="flex justify-between items-center p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
+                      <div>
+                        <p className="font-medium text-gray-900">{invite.referee?.full_name}</p>
+                        <p className="text-sm text-gray-500">{invite.referee?.phone}</p>
+                        <p className="text-xs text-blue-600 mt-1">{invite.course?.title || "Kurs tanlanmagan"}</p>
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        invite.status === 'active' ? 'bg-green-100 text-green-700' : 
+                        invite.status === 'left' ? 'bg-red-100 text-red-700' : 
+                        'bg-yellow-100 text-yellow-700'
+                      }`}>
+                        {invite.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            <div className="p-4 border-t border-gray-200 text-right bg-gray-50 rounded-b-xl">
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors"
+              >
+                Yopish
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

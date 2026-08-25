@@ -103,6 +103,22 @@ router.patch('/students/:id', async (req, res) => {
     res.json(data);
 });
 
+// GET /api/students/:id/invited - Talaba taklif qilgan o'quvchilar ro'yxatini olish
+router.get('/students/:id/invited', async (req, res) => {
+    const { id } = req.params;
+    const { data, error } = await supabase
+        .from('referrals')
+        .select(`
+            *,
+            course:courses(title, price),
+            referee:students!referrals_referee_id_fkey(full_name, phone)
+        `)
+        .eq('inviter_id', id);
+        
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+});
+
 // DELETE /api/students/:id - O'quvchini o'chirish
 router.delete('/students/:id', async (req, res) => {
     const { id } = req.params;
