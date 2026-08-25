@@ -156,20 +156,41 @@ bot.on('message:contact', async (ctx) => {
 bot.hears('👤 Mening hisobim', async (ctx) => {
     const telegramId = ctx.from.id;
     try {
-        const { data, error } = await supabase.rpc('get_student_billing_summary', { p_telegram_id: telegramId });
-        if (error) throw error;
-        if (data && data.length > 0) {
-            const summary = data[0];
-            const msg = `📊 **Sizning hisobingiz**\n\n` +
-                        `O'qiyotgan kurslaringiz umumiy narxi: ${summary.total_base_fee} so'm\n` +
-                        `Chegirmalar summasi: ${summary.total_discount} so'm (Faol do'stlar: ${summary.active_referrals_count} ta)\n` +
-                        `---------------------------------\n` +
-                        `💸 **To'lanadigan yakuniy summa:** ${summary.final_fee} so'm`;
-            await ctx.reply(msg, { parse_mode: "Markdown" });
-        } else {
-            await ctx.reply("Hisob ma'lumotlari topilmadi yoki siz hali hech qanday kursga yozilmagansiz.");
+        // 1. O'quvchini topamiz
+        const { data: student } = await supabase.from('students').select('id').eq('telegram_id', telegramId).single();
+        if (!student) {
+            return await ctx.reply("Siz hali ro'yxatdan o'tmagansiz.");
         }
+
+        // 2. Uning o'qiyotgan kurslari umumiy narxini hisoblaymiz
+        const { data: sc } = await supabase.from('student_courses').select('course:courses(price)').eq('student_id', student.id);
+        let baseFee = 0;
+        if (sc && sc.length > 0) {
+            sc.forEach(item => {
+                if (item.course && item.course.price) baseFee += item.course.price;
+            });
+        }
+
+        // 3. Uning faol takliflari sonini topamiz
+        const { data: refs } = await supabase.from('referrals').select('id').eq('inviter_id', student.id).eq('status', 'active');
+        const activeCount = refs ? refs.length : 0;
+
+        // 4. Chegirmani hisoblaymiz (Har bir faol bola uchun o'z kursining 5% qismi)
+        let discountPercent = activeCount * 5;
+        if (discountPercent > 100) discountPercent = 100; // 100% dan oshmaydi
+
+        const discountAmount = (baseFee * discountPercent) / 100;
+        const finalFee = baseFee - discountAmount;
+
+        const msg = `📊 **Sizning hisobingiz**\n\n` +
+                    `O'qiyotgan kurslaringiz umumiy narxi: ${baseFee.toLocaleString()} so'm\n` +
+                    `Chegirmalar summasi: ${discountAmount.toLocaleString()} so'm (Faol do'stlar: ${activeCount} ta, ${discountPercent}%)\n` +
+                    `---------------------------------\n` +
+                    `💸 **To'lanadigan yakuniy summa:** ${finalFee.toLocaleString()} so'm`;
+                    
+        await ctx.reply(msg, { parse_mode: "Markdown" });
     } catch (err) {
+        console.error(err);
         await ctx.reply("Xatolik yuz berdi.");
     }
 });
@@ -208,9 +229,8 @@ bot.hears('👥 Mening takliflarim', async (ctx) => {
             refs.forEach((r, i) => {
                 const statusEmoji = r.status === 'active' ? '✅' : (r.status === 'pending' ? '⏳' : '❌');
                 const courseName = r.course ? r.course.title : 'Kurs tanlanmagan';
-                const discount = r.status === 'active' && r.course ? (r.course.price * 0.05) : 0;
                 msg += `${i+1}. ${r.referee.full_name} - ${courseName} (${statusEmoji} ${r.status})\n`;
-                if (r.status === 'active') msg += `   *Chegirma:* ${discount} so'm\n`;
+                if (r.status === 'active') msg += `   *Chegirma:* +5% (Sizning o'z kursingizdan)\n`;
             });
             await ctx.reply(msg, { parse_mode: "Markdown" });
         } else {
