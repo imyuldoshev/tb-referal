@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
-import { Plus, Edit2, Trash2, X, Check } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, AlertTriangle } from 'lucide-react';
 
 export default function Courses() {
   const [courses, setCourses] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newCourse, setNewCourse] = useState({ title: '', price: '' });
-  const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({ title: '', price: '' });
+  
+  // Modals state
+  const [editingCourse, setEditingCourse] = useState(null); // Agar null bo'lmasa, Edit modal ochiladi
+  const [deletingId, setDeletingId] = useState(null); // Agar null bo'lmasa, Delete modal ochiladi
 
   const fetchCourses = async () => {
     try {
@@ -37,28 +39,24 @@ export default function Courses() {
     }
   };
 
-  const handleEditClick = (course) => {
-    setEditingId(course.id);
-    setEditForm({ title: course.title, price: course.price });
-  };
-
-  const handleSaveEdit = async (id) => {
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
     try {
-      await api.patch(`/courses/${id}`, {
-        title: editForm.title,
-        price: parseInt(editForm.price)
+      await api.patch(`/courses/${editingCourse.id}`, {
+        title: editingCourse.title,
+        price: parseInt(editingCourse.price)
       });
-      setEditingId(null);
+      setEditingCourse(null);
       fetchCourses();
     } catch (err) {
       alert("Xatolik: " + err.message);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Rostdan ham ushbu kursni o'chirmoqchimisiz?")) return;
+  const confirmDelete = async () => {
     try {
-      await api.delete(`/courses/${id}`);
+      await api.delete(`/courses/${deletingId}`);
+      setDeletingId(null);
       fetchCourses();
     } catch (err) {
       alert("Xatolik: " + err.message);
@@ -66,7 +64,7 @@ export default function Courses() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Kurslar</h2>
@@ -114,40 +112,29 @@ export default function Courses() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.map(course => (
           <div key={course.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-            {editingId === course.id ? (
-              <div className="space-y-4">
-                <input 
-                  type="text"
-                  value={editForm.title}
-                  onChange={(e) => setEditForm({...editForm, title: e.target.value})}
-                  className="w-full border border-gray-300 rounded p-2"
-                />
-                <input 
-                  type="number"
-                  value={editForm.price}
-                  onChange={(e) => setEditForm({...editForm, price: e.target.value})}
-                  className="w-full border border-gray-300 rounded p-2"
-                />
-                <div className="flex gap-2 justify-end mt-2">
-                  <button onClick={() => handleSaveEdit(course.id)} className="p-2 text-green-600 hover:bg-green-50 rounded"><Check size={20}/></button>
-                  <button onClick={() => setEditingId(null)} className="p-2 text-gray-400 hover:bg-gray-50 rounded"><X size={20}/></button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold text-xl mb-4">
-                  {course.title.charAt(0)}
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-1">{course.title}</h3>
-                <p className="text-2xl font-bold text-blue-600">
-                  {course.price.toLocaleString()} <span className="text-sm font-normal text-gray-500">so'm</span>
-                </p>
-                <div className="flex gap-2 justify-end mt-4 pt-4 border-t border-gray-100">
-                  <button onClick={() => handleEditClick(course)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"><Edit2 size={18}/></button>
-                  <button onClick={() => handleDelete(course.id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"><Trash2 size={18}/></button>
-                </div>
-              </>
-            )}
+            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold text-xl mb-4">
+              {course.title.charAt(0)}
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-1">{course.title}</h3>
+            <p className="text-2xl font-bold text-blue-600">
+              {course.price.toLocaleString()} <span className="text-sm font-normal text-gray-500">so'm</span>
+            </p>
+            <div className="flex gap-2 justify-end mt-4 pt-4 border-t border-gray-100">
+              <button 
+                onClick={() => setEditingCourse(course)} 
+                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                title="Tahrirlash"
+              >
+                <Edit2 size={18}/>
+              </button>
+              <button 
+                onClick={() => setDeletingId(course.id)} 
+                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                title="O'chirish"
+              >
+                <Trash2 size={18}/>
+              </button>
+            </div>
           </div>
         ))}
         {courses.length === 0 && (
@@ -156,6 +143,71 @@ export default function Courses() {
           </div>
         )}
       </div>
+
+      {/* Tahrirlash (Edit) Modali */}
+      {editingCourse && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-md">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+              <h3 className="text-xl font-bold text-gray-900">Kursni tahrirlash</h3>
+              <button onClick={() => setEditingCourse(null)} className="text-gray-400 hover:bg-gray-100 p-2 rounded-lg">
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleSaveEdit} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kurs nomi</label>
+                <input 
+                  type="text" 
+                  required
+                  className="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-blue-500"
+                  value={editingCourse.title}
+                  onChange={(e) => setEditingCourse({...editingCourse, title: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Narxi (so'm)</label>
+                <input 
+                  type="number" 
+                  required
+                  className="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-blue-500"
+                  value={editingCourse.price}
+                  onChange={(e) => setEditingCourse({...editingCourse, price: e.target.value})}
+                />
+              </div>
+              <div className="pt-4 flex gap-3 justify-end">
+                <button type="button" onClick={() => setEditingCourse(null)} className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 font-medium">
+                  Bekor qilish
+                </button>
+                <button type="submit" className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 font-medium">
+                  Saqlash
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* O'chirish (Delete) Modali */}
+      {deletingId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-sm text-center p-6">
+            <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle size={32} />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Ishonchingiz komilmi?</h3>
+            <p className="text-gray-500 mb-6">Siz bu kursni butunlay o'chirib tashlamoqchisiz. Bu amalni orqaga qaytarib bo'lmaydi.</p>
+            <div className="flex gap-3 justify-center">
+              <button onClick={() => setDeletingId(null)} className="px-6 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 font-medium w-full">
+                Yo'q, qoladi
+              </button>
+              <button onClick={confirmDelete} className="px-6 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 font-medium w-full">
+                Ha, o'chirilsin
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

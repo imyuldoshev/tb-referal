@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
-import { Search, Trash2, Edit2, X, Check, Eye } from 'lucide-react';
+import { Search, Trash2, Edit2, X, Eye, AlertTriangle } from 'lucide-react';
 
 export default function Students() {
   const [students, setStudents] = useState([]);
   const [courses, setCourses] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Tahrirlash uchun statelar
-  const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({ full_name: '', phone: '' });
+  // Tahrirlash (Edit) Modali
+  const [editingStudent, setEditingStudent] = useState(null);
+  
+  // O'chirish (Delete) Modali
+  const [deletingId, setDeletingId] = useState(null);
 
-  // Modal uchun statelar
+  // Ko'rish (View/Invites) Modali
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [invitedList, setInvitedList] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -43,28 +45,24 @@ export default function Students() {
     }
   };
 
-  const handleDeleteStudent = async (id) => {
-    if (!window.confirm("Bu o'quvchini va unga tegishli hamma takliflarni butunlay o'chirmoqchimisiz?")) return;
+  const confirmDelete = async () => {
     try {
-      await api.delete(`/students/${id}`);
+      await api.delete(`/students/${deletingId}`);
+      setDeletingId(null);
       fetchData();
     } catch (err) {
       alert("Xatolik: " + err.message);
     }
   };
 
-  const handleEditClick = (student) => {
-    setEditingId(student.id);
-    setEditForm({ full_name: student.full_name || '', phone: student.phone || '' });
-  };
-
-  const handleSaveEdit = async (id) => {
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
     try {
-      await api.patch(`/students/${id}`, {
-        full_name: editForm.full_name,
-        phone: editForm.phone
+      await api.patch(`/students/${editingStudent.id}`, {
+        full_name: editingStudent.full_name,
+        phone: editingStudent.phone
       });
-      setEditingId(null);
+      setEditingStudent(null);
       fetchData();
     } catch (err) {
       alert("Xatolik: " + err.message);
@@ -76,7 +74,7 @@ export default function Students() {
     try {
       const res = await api.get(`/students/${student.id}/invited`);
       setInvitedList(res.data);
-      setIsModalOpen(true);
+      setIsViewModalOpen(true);
     } catch (err) {
       alert("Taklif qilinganlarni yuklashda xatolik: " + err.message);
     }
@@ -126,34 +124,11 @@ export default function Students() {
                   ? student.referral_info[0] 
                   : null;
 
-                const isEditing = editingId === student.id;
-
                 return (
                   <tr key={student.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
                     <td className="p-4">
-                      {isEditing ? (
-                        <div className="space-y-2">
-                          <input 
-                            type="text"
-                            value={editForm.full_name}
-                            onChange={(e) => setEditForm({...editForm, full_name: e.target.value})}
-                            className="w-full border border-gray-300 rounded p-1 text-sm outline-none"
-                            placeholder="Ism familiya"
-                          />
-                          <input 
-                            type="text"
-                            value={editForm.phone}
-                            onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
-                            className="w-full border border-gray-300 rounded p-1 text-sm outline-none"
-                            placeholder="Telefon raqam"
-                          />
-                        </div>
-                      ) : (
-                        <>
-                          <p className="font-medium">{student.full_name}</p>
-                          <p className="text-sm text-gray-500">{student.phone || student.telegram_id}</p>
-                        </>
-                      )}
+                      <p className="font-medium">{student.full_name}</p>
+                      <p className="text-sm text-gray-500">{student.phone || student.telegram_id}</p>
                     </td>
                     <td className="p-4">
                       {refInfo ? (
@@ -179,7 +154,7 @@ export default function Students() {
                       <div className="flex items-center justify-between">
                         {/* Status o'zgartirish (faqat referali borlar uchun) */}
                         <div className="flex-1">
-                          {refInfo && !isEditing && (
+                          {refInfo && (
                             <select 
                               className="border border-gray-300 rounded p-1 outline-none text-sm"
                               value={refInfo.status}
@@ -194,36 +169,27 @@ export default function Students() {
 
                         {/* Tahrirlash, Ko'rish va O'chirish tugmalari */}
                         <div className="flex items-center gap-1 ml-4">
-                          {isEditing ? (
-                            <>
-                              <button onClick={() => handleSaveEdit(student.id)} className="p-2 text-green-600 hover:bg-green-50 rounded" title="Saqlash"><Check size={18}/></button>
-                              <button onClick={() => setEditingId(null)} className="p-2 text-gray-400 hover:bg-gray-50 rounded" title="Bekor qilish"><X size={18}/></button>
-                            </>
-                          ) : (
-                            <>
-                              <button 
-                                onClick={() => handleViewInvites(student)} 
-                                className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
-                                title="Taklif qilgan o'quvchilarini ko'rish"
-                              >
-                                <Eye size={18} />
-                              </button>
-                              <button 
-                                onClick={() => handleEditClick(student)} 
-                                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                                title="O'quvchini tahrirlash"
-                              >
-                                <Edit2 size={18} />
-                              </button>
-                              <button 
-                                onClick={() => handleDeleteStudent(student.id)} 
-                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                                title="O'quvchini butunlay o'chirish"
-                              >
-                                <Trash2 size={18} />
-                              </button>
-                            </>
-                          )}
+                          <button 
+                            onClick={() => handleViewInvites(student)} 
+                            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                            title="Taklif qilgan o'quvchilarini ko'rish"
+                          >
+                            <Eye size={18} />
+                          </button>
+                          <button 
+                            onClick={() => setEditingStudent({...student, phone: student.phone || ''})} 
+                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                            title="O'quvchini tahrirlash"
+                          >
+                            <Edit2 size={18} />
+                          </button>
+                          <button 
+                            onClick={() => setDeletingId(student.id)} 
+                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                            title="O'quvchini butunlay o'chirish"
+                          >
+                            <Trash2 size={18} />
+                          </button>
                         </div>
                       </div>
                     </td>
@@ -235,8 +201,10 @@ export default function Students() {
         </table>
       </div>
 
-      {/* Modal - Taklif qilingan o'quvchilar */}
-      {isModalOpen && selectedStudent && (
+      {/* --- MODALS --- */}
+
+      {/* Ko'rish (View/Invites) Modali */}
+      {isViewModalOpen && selectedStudent && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-lg w-full max-w-2xl max-h-[80vh] flex flex-col">
             <div className="p-6 border-b border-gray-200 flex justify-between items-center">
@@ -244,7 +212,7 @@ export default function Students() {
                 <h3 className="text-xl font-bold text-gray-900">{selectedStudent.full_name}</h3>
                 <p className="text-sm text-gray-500">Taklif qilgan o'quvchilari va skidkasi</p>
               </div>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:bg-gray-100 p-2 rounded-lg">
+              <button onClick={() => setIsViewModalOpen(false)} className="text-gray-400 hover:bg-gray-100 p-2 rounded-lg">
                 <X size={24} />
               </button>
             </div>
@@ -293,10 +261,75 @@ export default function Students() {
             
             <div className="p-4 border-t border-gray-200 text-right bg-gray-50 rounded-b-xl">
               <button 
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => setIsViewModalOpen(false)}
                 className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors"
               >
                 Yopish
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tahrirlash (Edit) Modali */}
+      {editingStudent && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-md">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+              <h3 className="text-xl font-bold text-gray-900">O'quvchini tahrirlash</h3>
+              <button onClick={() => setEditingStudent(null)} className="text-gray-400 hover:bg-gray-100 p-2 rounded-lg">
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleSaveEdit} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Ism va Familiya</label>
+                <input 
+                  type="text" 
+                  required
+                  className="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-blue-500"
+                  value={editingStudent.full_name}
+                  onChange={(e) => setEditingStudent({...editingStudent, full_name: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Telefon raqam</label>
+                <input 
+                  type="text" 
+                  required
+                  className="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-blue-500"
+                  value={editingStudent.phone}
+                  onChange={(e) => setEditingStudent({...editingStudent, phone: e.target.value})}
+                />
+              </div>
+              <div className="pt-4 flex gap-3 justify-end">
+                <button type="button" onClick={() => setEditingStudent(null)} className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 font-medium">
+                  Bekor qilish
+                </button>
+                <button type="submit" className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 font-medium">
+                  Saqlash
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* O'chirish (Delete) Modali */}
+      {deletingId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-sm text-center p-6">
+            <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle size={32} />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Ishonchingiz komilmi?</h3>
+            <p className="text-gray-500 mb-6">Siz bu o'quvchini va u bilan bog'liq hamma takliflarni butunlay o'chirib tashlamoqchisiz.</p>
+            <div className="flex gap-3 justify-center">
+              <button onClick={() => setDeletingId(null)} className="px-6 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 font-medium w-full">
+                Yo'q, qoladi
+              </button>
+              <button onClick={confirmDelete} className="px-6 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 font-medium w-full">
+                Ha, o'chirilsin
               </button>
             </div>
           </div>
