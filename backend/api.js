@@ -15,6 +15,17 @@ router.get('/students', async (req, res) => {
     res.json(data);
 });
 
+// GET /api/courses - Barcha kurslarni olish
+router.get('/courses', async (req, res) => {
+    const { data, error } = await supabase
+        .from('courses')
+        .select('*')
+        .order('created_at', { ascending: true });
+        
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+});
+
 // POST /api/courses - Yangi kurs qo'shish
 router.post('/courses', async (req, res) => {
     const { title, price } = req.body;
