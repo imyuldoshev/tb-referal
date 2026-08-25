@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
-import { Search } from 'lucide-react';
+import { Search, Trash2 } from 'lucide-react';
 
 export default function Students() {
   const [students, setStudents] = useState([]);
@@ -28,6 +28,16 @@ export default function Students() {
     if(!referralId) return;
     try {
       await api.patch(`/referrals/${referralId}`, { status: newStatus });
+      fetchData();
+    } catch (err) {
+      alert("Xatolik: " + err.message);
+    }
+  };
+
+  const handleDeleteStudent = async (id) => {
+    if (!window.confirm("Bu o'quvchini va unga tegishli hamma takliflarni butunlay o'chirmoqchimisiz?")) return;
+    try {
+      await api.delete(`/students/${id}`);
       fetchData();
     } catch (err) {
       alert("Xatolik: " + err.message);
@@ -106,17 +116,28 @@ export default function Students() {
                       )}
                     </td>
                     <td className="p-4">
-                      {refInfo && (
-                        <select 
-                          className="border border-gray-300 rounded p-1 outline-none text-sm"
-                          value={refInfo.status}
-                          onChange={(e) => handleStatusChange(refInfo.id, e.target.value)}
+                      <div className="flex items-center justify-between">
+                        {refInfo ? (
+                          <select 
+                            className="border border-gray-300 rounded p-1 outline-none text-sm"
+                            value={refInfo.status}
+                            onChange={(e) => handleStatusChange(refInfo.id, e.target.value)}
+                          >
+                            <option value="pending">Kutilmoqda (Pending)</option>
+                            <option value="active">Faol (Active)</option>
+                            <option value="left">Ketdi (Left)</option>
+                          </select>
+                        ) : (
+                          <span></span>
+                        )}
+                        <button 
+                          onClick={() => handleDeleteStudent(student.id)} 
+                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors ml-4"
+                          title="O'quvchini butunlay o'chirish"
                         >
-                          <option value="pending">Kutilmoqda (Pending)</option>
-                          <option value="active">Faol (Active)</option>
-                          <option value="left">Ketdi (Left)</option>
-                        </select>
-                      )}
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );

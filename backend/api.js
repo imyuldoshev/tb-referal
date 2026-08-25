@@ -38,6 +38,32 @@ router.post('/courses', async (req, res) => {
     res.json(data);
 });
 
+// PATCH /api/courses/:id - Kursni tahrirlash
+router.patch('/courses/:id', async (req, res) => {
+    const { id } = req.params;
+    const { title, price } = req.body;
+    const { data, error } = await supabase
+        .from('courses')
+        .update({ title, price })
+        .eq('id', id)
+        .select();
+        
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+});
+
+// DELETE /api/courses/:id - Kursni o'chirish
+router.delete('/courses/:id', async (req, res) => {
+    const { id } = req.params;
+    const { data, error } = await supabase
+        .from('courses')
+        .delete()
+        .eq('id', id);
+        
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ success: true });
+});
+
 // GET /api/referrals - Barcha referallarni olish (O'quvchilar va statuslarni ko'rish uchun)
 // GET /api/students_full - Barcha talabalarni va ularni taklif qilganlarni olish
 router.get('/students_full', async (req, res) => {
@@ -61,6 +87,18 @@ router.get('/students_full', async (req, res) => {
         
     if (error) return res.status(500).json({ error: error.message });
     res.json(data);
+});
+
+// DELETE /api/students/:id - O'quvchini o'chirish
+router.delete('/students/:id', async (req, res) => {
+    const { id } = req.params;
+    const { data, error } = await supabase
+        .from('students')
+        .delete()
+        .eq('id', id);
+        
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ success: true });
 });
 
 // PATCH /api/referrals/:id - Referal statusini o'zgartirish (va kursga biriktirish)
