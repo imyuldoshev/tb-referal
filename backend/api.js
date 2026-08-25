@@ -81,6 +81,9 @@ router.get('/students_full', async (req, res) => {
                 status,
                 course:courses(id, title),
                 inviter:students!referrals_inviter_id_fkey(full_name)
+            ),
+            enrolled_courses:student_courses(
+                course:courses(id, title)
             )
         `)
         .order('created_at', { ascending: false });
