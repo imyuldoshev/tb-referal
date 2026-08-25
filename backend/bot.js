@@ -16,9 +16,7 @@ const showMainMenu = async (ctx) => {
 
 bot.command('start', async (ctx) => {
     const telegramId = ctx.from.id;
-    // Telegram'dagi ismini olamiz
-    const fullName = `${ctx.from.first_name} ${ctx.from.last_name || ''}`.trim();
-    const inviterCode = ctx.match; // ref kodni ushlab qolamiz
+    const inviterCode = ctx.match; 
 
     try {
         let { data: existingStudent } = await supabase
@@ -30,12 +28,12 @@ bot.command('start', async (ctx) => {
         if (!existingStudent) {
             const myRefCode = `REF_${telegramId}`; 
             
-            // 1. Bazaga yangi o'quvchini darhol qo'shamiz (telefon raqamsiz)
+            // 1. Bazaga yangi o'quvchini darhol qo'shamiz (ISMni 'pending' qilib)
             const { data: newStudent, error: insertError } = await supabase
                 .from('students')
                 .insert([{ 
                     telegram_id: telegramId, 
-                    full_name: fullName, 
+                    full_name: 'pending', // Vaqtinchalik
                     referral_code: myRefCode 
                 }])
                 .select()
@@ -44,7 +42,7 @@ bot.command('start', async (ctx) => {
             if (insertError) throw insertError;
             existingStudent = newStudent;
 
-            // 2. Agar referal orqali kelgan bo'lsa, referrals jadvaliga qo'shamiz
+            // 2. Agar referal orqali kelgan bo'lsa
             if (inviterCode && inviterCode !== myRefCode) {
                 const { data: inviter } = await supabase
                     .from('students')
@@ -61,14 +59,15 @@ bot.command('start', async (ctx) => {
                 }
             }
 
-            // Raqam so'raymiz
-            const phoneKeyboard = new Keyboard().requestContact("📱 Raqamni yuborish").resized();
-            await ctx.reply(`Assalomu alaykum, ${fullName}!\nMarkazimizning referal botiga xush kelibsiz.\n\nRo'yxatdan o'tishni yakunlash uchun pastdagi tugma orqali telefon raqamingizni yuboring:`, {
-                reply_markup: phoneKeyboard
+            // Haqiqiy Ism va Familiya so'raymiz
+            await ctx.reply(`Assalomu alaykum!\nMarkazimizning referal botiga xush kelibsiz.\n\nIltimos, haqiqiy **Ism va Familiyangizni** kiriting (Masalan: Alisher G'aniyev):`, {
+                reply_markup: { remove_keyboard: true }
             });
             return;
+        } else if (existingStudent.full_name === 'pending') {
+            await ctx.reply(`Iltimos, ro'yxatdan o'tishni davom ettirish uchun haqiqiy **Ism va Familiyangizni** kiriting:`);
+            return;
         } else if (!existingStudent.phone) {
-            // Akkaunti bor, lekin telefon raqami yo'q
             const phoneKeyboard = new Keyboard().requestContact("📱 Raqamni yuborish").resized();
             await ctx.reply(`Iltimos, ro'yxatdan o'tishni yakunlash uchun telefon raqamingizni yuboring:`, {
                 reply_markup: phoneKeyboard
@@ -76,7 +75,7 @@ bot.command('start', async (ctx) => {
             return;
         }
 
-        // Tizimda to'liq bor bo'lsa
+        // Tizimda to'liq ro'yxatdan o'tgan bo'lsa
         await ctx.reply(`Assalomu alaykum yana bir bor, ${existingStudent.full_name}!`);
         await showMainMenu(ctx);
         
@@ -86,23 +85,67 @@ bot.command('start', async (ctx) => {
     }
 });
 
+// Matnli xabarlarni tutib olish (Ism kiritilganda ishlashi uchun)
+bot.on('message:text', async (ctx, next) => {
+    const text = ctx.message.text;
+    const telegramId = ctx.from.id;
+
+    // Menyu tugmalariga ta'sir qilmasligi uchun
+    if (['👤 Mening hisobim', '🔗 Referal havolam', '👥 Mening takliflarim', '❓ Qoidalar'].includes(text)) {
+        return next();
+    }
+
+    try {
+        const { data: student } = await supabase
+            .from('students')
+            .select('*')
+            .eq('telegram_id', telegramId)
+            .single();
+
+        // Agar foydalanuvchi bazada bor bo'lsa va ismi 'pending' bo'lsa
+        if (student && student.full_name === 'pending') {
+            // Ismni yangilaymiz
+            await supabase
+                .from('students')
+                .update({ full_name: text })
+                .eq('telegram_id', telegramId);
+            
+            // Va telefon raqam so'raymiz
+            const phoneKeyboard = new Keyboard().requestContact("📱 Raqamni yuborish").resized();
+            await ctx.reply(`Rahmat, ${text}!\n\nEndi telefon raqamingizni yuboring. Buning uchun pastdagi tugmani bosing:`, {
+                reply_markup: phoneKeyboard
+            });
+            return;
+        }
+    } catch (err) {
+        console.error(err);
+    }
+    
+    return next();
+});
+
 // Kontakt (Telefon raqam) ni tutib olish
 bot.on('message:contact', async (ctx) => {
     const phone = ctx.message.contact.phone_number;
     const telegramId = ctx.from.id;
 
     try {
-        // Raqamni bazaga saqlaymiz (UPDATE)
-        const { error } = await supabase
+        const { data: student } = await supabase
             .from('students')
-            .update({ phone: phone })
-            .eq('telegram_id', telegramId);
+            .select('*')
+            .eq('telegram_id', telegramId)
+            .single();
 
-        if (error) throw error;
+        if (student && !student.phone) {
+            // Raqamni bazaga saqlaymiz
+            await supabase
+                .from('students')
+                .update({ phone: phone })
+                .eq('telegram_id', telegramId);
 
-        await ctx.reply("Ro'yxatdan muvaffaqiyatli o'tdingiz!", { reply_markup: { remove_keyboard: true } });
-        await showMainMenu(ctx);
-        
+            await ctx.reply("Ro'yxatdan muvaffaqiyatli o'tdingiz!", { reply_markup: { remove_keyboard: true } });
+            await showMainMenu(ctx);
+        }
     } catch (err) {
         console.error(err);
         await ctx.reply("Raqamni saqlashda xatolik yuz berdi.");
