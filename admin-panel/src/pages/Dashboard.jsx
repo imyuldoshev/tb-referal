@@ -4,13 +4,16 @@ import { Users, UserPlus, BookOpen } from 'lucide-react';
 
 function StatCard({ title, value, icon, color }) {
   return (
-    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
-      <div className={`p-4 rounded-lg ${color} text-white`}>
-        {icon}
+    <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center text-center gap-3">
+      <div className={`p-3 min-[446px]:p-4 rounded-lg ${color} text-white flex items-center justify-center`}>
+        {/* We clone the icon to adjust its size based on viewport if needed, or we just handle it via CSS */}
+        <div className="w-5 h-5 min-[446px]:w-6 min-[446px]:h-6 flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+          {icon}
+        </div>
       </div>
       <div>
-        <h3 className="text-gray-500 text-sm font-medium">{title}</h3>
-        <p className="text-2xl font-bold text-gray-900">{value}</p>
+        <h3 className="text-gray-500 text-xs min-[446px]:text-sm font-medium">{title}</h3>
+        <p className="text-xl min-[446px]:text-2xl font-bold text-gray-900">{value}</p>
       </div>
     </div>
   );
@@ -47,29 +50,29 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 min-[446px]:space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
-        <p className="text-gray-500">Tizim bo'yicha umumiy statistika</p>
+        <h2 className="text-xl min-[446px]:text-2xl font-bold text-gray-900">Dashboard</h2>
+        <p className="text-xs min-[446px]:text-sm text-gray-500">Tizim bo'yicha umumiy statistika</p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 min-[1001px]:grid-cols-3 gap-4 min-[446px]:gap-6">
         <StatCard 
           title="Jami O'quvchilar" 
           value={stats.totalStudents} 
-          icon={<Users size={24} />} 
+          icon={<Users />} 
           color="bg-blue-500" 
         />
         <StatCard 
           title="Faol Referallar" 
           value={stats.activeReferrals} 
-          icon={<UserPlus size={24} />} 
+          icon={<UserPlus />} 
           color="bg-green-500" 
         />
         <StatCard 
           title="Kurslar soni" 
           value={stats.totalCourses} 
-          icon={<BookOpen size={24} />} 
+          icon={<BookOpen />} 
           color="bg-purple-500" 
         />
       </div>
