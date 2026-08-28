@@ -64,15 +64,15 @@ export default function Courses() {
   };
 
   return (
-    <div className="space-y-6 relative">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 min-[446px]:space-y-6 relative">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Kurslar</h2>
-          <p className="text-gray-500">Barcha mavjud kurslarni boshqarish</p>
+          <h2 className="text-xl min-[446px]:text-2xl font-bold text-gray-900">Kurslar</h2>
+          <p className="text-xs min-[446px]:text-sm text-gray-500">Barcha mavjud kurslarni boshqarish</p>
         </div>
         <button 
           onClick={() => setShowAddForm(!showAddForm)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors w-full sm:w-auto justify-center"
         >
           <Plus size={20} />
           Yangi Kurs Qo'shish
@@ -80,9 +80,9 @@ export default function Courses() {
       </div>
 
       {showAddForm && (
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <form onSubmit={handleAddCourse} className="flex gap-4 items-end">
-            <div className="flex-1">
+        <div className="bg-white p-4 min-[446px]:p-6 rounded-xl shadow-sm border border-gray-200">
+          <form onSubmit={handleAddCourse} className="flex flex-col min-[446px]:flex-row gap-4 items-start min-[446px]:items-end">
+            <div className="w-full min-[446px]:flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-1">Kurs nomi</label>
               <input 
                 type="text" 
@@ -92,7 +92,7 @@ export default function Courses() {
                 onChange={(e) => setNewCourse({...newCourse, title: e.target.value})}
               />
             </div>
-            <div className="flex-1">
+            <div className="w-full min-[446px]:flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-1">Narxi (so'm)</label>
               <input 
                 type="number" 
@@ -102,24 +102,24 @@ export default function Courses() {
                 onChange={(e) => setNewCourse({...newCourse, price: e.target.value})}
               />
             </div>
-            <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-green-700 h-[42px]">
+            <button type="submit" className="w-full min-[446px]:w-auto bg-green-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-green-700 h-[42px]">
               Saqlash
             </button>
           </form>
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 min-[446px]:gap-6">
         {courses.map(course => (
-          <div key={course.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold text-xl mb-4">
+          <div key={course.id} className="bg-white p-4 min-[446px]:p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div className="w-10 h-10 min-[446px]:w-12 min-[446px]:h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold text-lg min-[446px]:text-xl mb-3 min-[446px]:mb-4">
               {course.title.charAt(0)}
             </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-1">{course.title}</h3>
-            <p className="text-2xl font-bold text-blue-600">
-              {course.price.toLocaleString()} <span className="text-sm font-normal text-gray-500">so'm</span>
+            <h3 className="text-base min-[446px]:text-lg font-bold text-gray-900 mb-1">{course.title}</h3>
+            <p className="text-xl min-[446px]:text-2xl font-bold text-blue-600">
+              {course.price.toLocaleString()} <span className="text-xs min-[446px]:text-sm font-normal text-gray-500">so'm</span>
             </p>
-            <div className="flex gap-2 justify-end mt-4 pt-4 border-t border-gray-100">
+            <div className="flex gap-2 justify-end mt-3 min-[446px]:mt-4 pt-3 min-[446px]:pt-4 border-t border-gray-100">
               <button 
                 onClick={() => setEditingCourse(course)} 
                 className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"

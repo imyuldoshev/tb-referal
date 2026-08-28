@@ -141,147 +141,159 @@ export default function Students() {
   });
 
   return (
-    <div className="space-y-6 relative">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 min-[446px]:space-y-6 relative">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">O'quvchilar va Referallar</h2>
-          <p className="text-gray-500">Talabalar ro'yxati va ularning taklif holati</p>
+          <h2 className="text-xl min-[446px]:text-2xl font-bold text-gray-900">O'quvchilar va Referallar</h2>
+          <p className="text-xs min-[446px]:text-sm text-gray-500">Talabalar ro'yxati va ularning taklif holati</p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-col min-[446px]:flex-row gap-2 min-[446px]:gap-4 w-full lg:w-auto">
           <select 
             value={filterCourse}
             onChange={(e) => setFilterCourse(e.target.value)}
-            className="border border-gray-300 rounded-lg p-2 outline-none focus:border-blue-500 bg-white"
+            className="border border-gray-300 rounded-lg p-2 outline-none focus:border-blue-500 bg-white w-full min-[446px]:w-auto"
           >
             <option value="all">Barcha kurslar</option>
             {courses.map(c => (
               <option key={c.id} value={c.id}>{c.title}</option>
             ))}
           </select>
-          <div className="relative">
+          <div className="relative w-full min-[446px]:w-auto">
             <input 
               type="text" 
               placeholder="Ism bo'yicha qidiruv..." 
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg outline-none focus:border-blue-500 w-64 bg-white"
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg outline-none focus:border-blue-500 w-full min-[446px]:w-64 bg-white"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <Search size={18} className="absolute left-3 top-3 text-gray-400" />
+            <Search size={18} className="absolute left-3 top-2.5 text-gray-400" />
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-gray-50 border-b border-gray-200">
-              <th className="p-4 font-medium text-gray-600">O'quvchi</th>
-              <th className="p-4 font-medium text-gray-600">O'qiyotgan Kursi</th>
-              <th className="p-4 font-medium text-gray-600">Taklif qildi (Inviter)</th>
-              <th className="p-4 font-medium text-gray-600">Referal Statusi</th>
-              <th className="p-4 font-medium text-gray-600 text-right">Harakatlar</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredStudents.length === 0 ? (
-              <tr><td colSpan="5" className="p-8 text-center text-gray-500">Hech qanday ma'lumot topilmadi</td></tr>
-            ) : (
-              filteredStudents.map(student => {
-                const refInfo = student.referral_info && student.referral_info.length > 0 
-                  ? student.referral_info[0] 
-                  : null;
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden w-full">
+        <div className="overflow-x-auto w-full">
+          <table className="w-full text-left border-collapse whitespace-nowrap min-w-[700px]">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="p-4 font-medium text-gray-600">O'quvchi</th>
+                <th className="p-4 font-medium text-gray-600">O'qiyotgan Kursi</th>
+                <th className="p-4 font-medium text-gray-600">Taklif qildi (Inviter)</th>
+                <th className="p-4 font-medium text-gray-600">Referal Statusi</th>
+                <th className="p-4 font-medium text-gray-600 text-right">Harakatlar</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredStudents.length === 0 ? (
+                <tr><td colSpan="5" className="p-8 text-center text-gray-500">Hech qanday ma'lumot topilmadi</td></tr>
+              ) : (
+                filteredStudents.map(student => {
+                  const refInfo = student.referral_info && student.referral_info.length > 0 
+                    ? student.referral_info[0] 
+                    : null;
 
-                // Kurslarini topish
-                let courseNames = [];
-                if (refInfo && refInfo.course) courseNames.push(refInfo.course.title);
-                if (student.enrolled_courses) {
-                  student.enrolled_courses.forEach(ec => {
-                    if (ec.course && !courseNames.includes(ec.course.title)) {
-                      courseNames.push(ec.course.title);
-                    }
-                  });
-                }
+                  // Kurslarini topish
+                  let courseNames = [];
+                  if (refInfo && refInfo.course) courseNames.push(refInfo.course.title);
+                  if (student.enrolled_courses) {
+                    student.enrolled_courses.forEach(ec => {
+                      if (ec.course && !courseNames.includes(ec.course.title)) {
+                        courseNames.push(ec.course.title);
+                      }
+                    });
+                  }
 
-                return (
-                  <tr key={student.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
-                    <td className="p-4">
-                      <p className="font-medium text-gray-900">{student.full_name}</p>
-                      <p className="text-sm text-gray-500">{student.phone || student.telegram_id}</p>
-                    </td>
-                    <td className="p-4">
-                      {courseNames.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mb-2">
-                          {courseNames.map((cName, i) => (
-                            <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-md border border-blue-100">
-                              <Book size={12} /> {cName}
+                  return (
+                    <tr key={student.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
+                      <td className="p-4">
+                        {student.full_name === 'pending' ? (
+                          <div className="mb-1">
+                            <span className="inline-flex items-center px-2 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-md border border-amber-200">
+                              Ro'yxatdan o'tish tugallanmagan
                             </span>
-                          ))}
-                        </div>
-                      )}
-                      <select 
-                        className="border border-gray-300 rounded p-1 outline-none text-xs bg-gray-50 w-full hover:border-blue-400 transition-colors"
-                        value="" // Doim bo'sh turadi, chunki bu faqat harakat (action)
-                        onChange={(e) => handleEnrollClick(student, e.target.value)}
-                      >
-                        <option value="">+ Kursga qo'shish...</option>
-                        {courses.map(c => (
-                          <option key={c.id} value={c.id}>{c.title}</option>
-                        ))}
-                      </select>
-                    </td>
-                    <td className="p-4">
-                      {refInfo ? (
-                         <p className="font-medium text-blue-600">{refInfo.inviter?.full_name}</p>
-                      ) : (
-                         <span className="text-gray-400 italic text-sm">O'zi kelgan</span>
-                      )}
-                    </td>
-                    <td className="p-4">
-                      {refInfo ? (
+                          </div>
+                        ) : (
+                          <p className="font-medium text-gray-900">{student.full_name}</p>
+                        )}
+                        <p className="text-sm text-gray-500 mt-0.5">
+                          {student.phone ? student.phone : <span className="text-gray-400 text-xs">ID: {student.telegram_id}</span>}
+                        </p>
+                      </td>
+                      <td className="p-4">
+                        {courseNames.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-2">
+                            {courseNames.map((cName, i) => (
+                              <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-md border border-blue-100">
+                                <Book size={12} /> {cName}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                         <select 
-                          className="border border-gray-300 rounded p-1 outline-none text-sm bg-white"
-                          value={refInfo.status}
-                          onChange={(e) => handleStatusChange(refInfo.id, e.target.value)}
+                          className="border border-gray-300 rounded p-1 outline-none text-xs bg-gray-50 w-full hover:border-blue-400 transition-colors min-w-[120px]"
+                          value="" // Doim bo'sh turadi, chunki bu faqat harakat (action)
+                          onChange={(e) => handleEnrollClick(student, e.target.value)}
                         >
-                          <option value="pending">Kutilmoqda (Pending)</option>
-                          <option value="active">Faol (Active)</option>
-                          <option value="left">Ketdi (Left)</option>
+                          <option value="">+ Kursga qo'shish...</option>
+                          {courses.map(c => (
+                            <option key={c.id} value={c.id}>{c.title}</option>
+                          ))}
                         </select>
-                      ) : (
-                        <span className="text-gray-300">-</span>
-                      )}
-                    </td>
-                    <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button 
-                          onClick={() => handleViewInvites(student)} 
-                          className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
-                          title="Taklif qilgan o'quvchilarini ko'rish"
-                        >
-                          <Eye size={18} />
-                        </button>
-                        <button 
-                          onClick={() => setEditingStudent({...student, phone: student.phone || ''})} 
-                          className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                          title="O'quvchini tahrirlash"
-                        >
-                          <Edit2 size={18} />
-                        </button>
-                        <button 
-                          onClick={() => setDeletingId(student.id)} 
-                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                          title="O'quvchini butunlay o'chirish"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+                      </td>
+                      <td className="p-4">
+                        {refInfo ? (
+                           <p className="font-medium text-blue-600">{refInfo.inviter?.full_name}</p>
+                        ) : (
+                           <span className="text-gray-400 italic text-sm">O'zi kelgan</span>
+                        )}
+                      </td>
+                      <td className="p-4">
+                        {refInfo ? (
+                          <select 
+                            className="border border-gray-300 rounded p-1 outline-none text-sm bg-white"
+                            value={refInfo.status}
+                            onChange={(e) => handleStatusChange(refInfo.id, e.target.value)}
+                          >
+                            <option value="pending">Kutilmoqda (Pending)</option>
+                            <option value="active">Faol (Active)</option>
+                            <option value="left">Ketdi (Left)</option>
+                          </select>
+                        ) : (
+                          <span className="text-gray-300">-</span>
+                        )}
+                      </td>
+                      <td className="p-4 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <button 
+                            onClick={() => handleViewInvites(student)} 
+                            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                            title="Taklif qilgan o'quvchilarini ko'rish"
+                          >
+                            <Eye size={18} />
+                          </button>
+                          <button 
+                            onClick={() => setEditingStudent({...student, phone: student.phone || ''})} 
+                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                            title="O'quvchini tahrirlash"
+                          >
+                            <Edit2 size={18} />
+                          </button>
+                          <button 
+                            onClick={() => setDeletingId(student.id)} 
+                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                            title="O'quvchini butunlay o'chirish"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* --- MODALS --- */}
