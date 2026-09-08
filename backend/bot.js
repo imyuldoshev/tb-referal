@@ -104,15 +104,17 @@ bot.on('message:text', async (ctx, next) => {
 
         // Agar foydalanuvchi bazada bor bo'lsa va ismi 'pending' bo'lsa
         if (student && student.full_name === 'pending') {
-            // Ismni yangilaymiz
+            // Ismni yangilaymiz (Formatlash: azimov temur -> Azimov Temur)
+            const formattedName = text.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+            
             await supabase
                 .from('students')
-                .update({ full_name: text })
+                .update({ full_name: formattedName })
                 .eq('telegram_id', telegramId);
             
             // Va telefon raqam so'raymiz
             const phoneKeyboard = new Keyboard().requestContact("📱 Raqamni yuborish").resized();
-            await ctx.reply(`Rahmat, ${text}!\n\nEndi telefon raqamingizni yuboring. Buning uchun pastdagi tugmani bosing:`, {
+            await ctx.reply(`Rahmat, ${formattedName}!\n\nEndi telefon raqamingizni yuboring. Buning uchun pastdagi tugmani bosing:`, {
                 reply_markup: phoneKeyboard
             });
             return;

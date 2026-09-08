@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../api';
 import { Search, Trash2, Edit2, X, Eye, AlertTriangle, Book, PlusCircle } from 'lucide-react';
 
-export default function Students() {
+export default function Students({ archiveMode = false }) {
   const [students, setStudents] = useState([]);
   const [courses, setCourses] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -126,6 +126,12 @@ export default function Students() {
   };
 
   const filteredStudents = students.filter(s => {
+    // Determine if student has completed registration
+    const isCompleted = s.full_name !== 'pending' && s.phone;
+    
+    if (archiveMode && isCompleted) return false;
+    if (!archiveMode && !isCompleted) return false;
+
     const term = searchQuery.toLowerCase();
     const name = s.full_name?.toLowerCase() || '';
     const matchesSearch = name.includes(term);
@@ -144,8 +150,8 @@ export default function Students() {
     <div className="space-y-4 min-[446px]:space-y-6 relative">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
-          <h2 className="text-xl min-[446px]:text-2xl font-bold text-gray-900">O'quvchilar va Referallar</h2>
-          <p className="text-xs min-[446px]:text-sm text-gray-500">Talabalar ro'yxati va ularning taklif holati</p>
+          <h2 className="text-xl min-[446px]:text-2xl font-bold text-gray-900">{archiveMode ? "Arxiv" : "O'quvchilar va Referallar"}</h2>
+          <p className="text-xs min-[446px]:text-sm text-gray-500">{archiveMode ? "Ro'yxatdan o'tishni tugallamagan talabalar" : "Talabalar ro'yxati va ularning taklif holati"}</p>
         </div>
         <div className="flex flex-col min-[446px]:flex-row gap-2 min-[446px]:gap-4 w-full lg:w-auto">
           <select 

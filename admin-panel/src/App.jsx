@@ -4,7 +4,7 @@ import Dashboard from './pages/Dashboard';
 import Courses from './pages/Courses';
 import Students from './pages/Students';
 import Login from './pages/Login';
-import { LayoutDashboard, BookOpen, Users, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Users, LogOut, Menu, X, Archive } from 'lucide-react';
 
 function Sidebar({ onLogout, isOpen, onClose }) {
   const location = useLocation();
@@ -13,6 +13,7 @@ function Sidebar({ onLogout, isOpen, onClose }) {
     { name: 'Dashboard', path: '/', icon: <LayoutDashboard size={20} /> },
     { name: 'Kurslar', path: '/courses', icon: <BookOpen size={20} /> },
     { name: 'O\'quvchilar', path: '/students', icon: <Users size={20} /> },
+    { name: 'Arxiv', path: '/archive', icon: <Archive size={20} /> },
   ];
 
   return (
@@ -152,7 +153,8 @@ function App() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/courses" element={<Courses />} />
-              <Route path="/students" element={<Students />} />
+              <Route path="/students" element={<Students archiveMode={false} />} />
+              <Route path="/archive" element={<Students archiveMode={true} />} />
             </Routes>
           </div>
         </div>
