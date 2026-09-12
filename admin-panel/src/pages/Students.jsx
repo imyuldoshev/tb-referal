@@ -196,8 +196,9 @@ export default function Students({ archiveMode = false }) {
     if (!archiveMode && !isCompleted) return false;
 
     if (!archiveMode) {
-      if (viewMode === 'manual' && !(s.referral_code && s.referral_code.startsWith('MANUAL_'))) return false;
-      if (viewMode === 'bot' && s.referral_code && s.referral_code.startsWith('MANUAL_')) return false;
+      const isManual = s.referral_code?.startsWith('MANUAL_') || (!s.referral_code?.startsWith('REF_') && s.telegram_id === null);
+      if (viewMode === 'manual' && !isManual) return false;
+      if (viewMode === 'bot' && isManual) return false;
     }
 
     const term = searchQuery.toLowerCase();
@@ -418,7 +419,7 @@ export default function Students({ archiveMode = false }) {
                            <p className="font-medium text-blue-600">{refInfo.inviter?.full_name}</p>
                         ) : (
                            <span className="text-gray-400 italic text-sm">
-                             {student.referral_code?.startsWith('MANUAL_') ? "Qo'lda qo'shilgan" : "O'zi kelgan"}
+                             {(student.referral_code?.startsWith('MANUAL_') || (!student.referral_code?.startsWith('REF_') && student.telegram_id === null)) ? "Qo'lda qo'shilgan" : "O'zi kelgan"}
                            </span>
                         )}
                       </td>
