@@ -233,34 +233,34 @@ export default function Students({ archiveMode = false }) {
     return (
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">O'quvchilar</h2>
-          <p className="text-gray-500">O'quvchilar ro'yxatini ko'rish usulini tanlang</p>
+          <h2 className="text-2xl font-bold text-[var(--color-text-main)]">O'quvchilar</h2>
+          <p className="text-[var(--color-text-muted)]">O'quvchilar ro'yxatini ko'rish usulini tanlang</p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div 
             onClick={() => setViewMode('manual')}
-            className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 cursor-pointer hover:border-blue-500 hover:shadow-md transition-all flex flex-col items-center justify-center text-center gap-4"
+            className="bg-[var(--color-panel-dark)] p-8 rounded-xl shadow-sm border border-[var(--color-border-dark)] cursor-pointer hover:border-blue-500 hover:shadow-md transition-all flex flex-col items-center justify-center text-center gap-4"
           >
-            <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-[var(--color-brand-orange)]/20 text-[var(--color-brand-orange)] rounded-full flex items-center justify-center">
               <PlusCircle size={32} />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900">Qo'lda qo'shilganlar</h3>
-              <p className="text-gray-500 mt-2">Siz tomoningizdan tizimga kiritilgan o'quvchilar</p>
+              <h3 className="text-xl font-bold text-[var(--color-text-main)]">Qo'lda qo'shilganlar</h3>
+              <p className="text-[var(--color-text-muted)] mt-2">Siz tomoningizdan tizimga kiritilgan o'quvchilar</p>
             </div>
           </div>
 
           <div 
             onClick={() => setViewMode('bot')}
-            className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 cursor-pointer hover:border-blue-500 hover:shadow-md transition-all flex flex-col items-center justify-center text-center gap-4"
+            className="bg-[var(--color-panel-dark)] p-8 rounded-xl shadow-sm border border-[var(--color-border-dark)] cursor-pointer hover:border-blue-500 hover:shadow-md transition-all flex flex-col items-center justify-center text-center gap-4"
           >
-            <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-[var(--color-brand-orange)]/20 text-[var(--color-brand-orange)] rounded-full flex items-center justify-center">
               <Users size={32} />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900">Bot orqali kelganlar</h3>
-              <p className="text-gray-500 mt-2">Telegram botdan ro'yxatdan o'tgan o'quvchilar</p>
+              <h3 className="text-xl font-bold text-[var(--color-text-main)]">Bot orqali kelganlar</h3>
+              <p className="text-[var(--color-text-muted)] mt-2">Telegram botdan ro'yxatdan o'tgan o'quvchilar</p>
             </div>
           </div>
         </div>
@@ -274,17 +274,17 @@ export default function Students({ archiveMode = false }) {
         <div>
           <div className="flex items-center gap-3">
 
-            <h2 className="text-xl min-[446px]:text-2xl font-bold text-gray-900">
+            <h2 className="text-xl min-[446px]:text-2xl font-bold text-[var(--color-text-main)]">
               {archiveMode ? "Arxiv" : viewMode === 'manual' ? "Qo'lda qo'shilganlar" : viewMode === 'bot' ? "Bot o'quvchilari" : "O'quvchilar va Referallar"}
             </h2>
           </div>
-          <p className="text-xs min-[446px]:text-sm text-gray-500 mt-1">{archiveMode ? "Ro'yxatdan o'tishni tugallamagan talabalar" : "Talabalar ro'yxati va ularning taklif holati"}</p>
+          <p className="text-xs min-[446px]:text-sm text-[var(--color-text-muted)] mt-1">{archiveMode ? "Ro'yxatdan o'tishni tugallamagan talabalar" : "Talabalar ro'yxati va ularning taklif holati"}</p>
         </div>
         <div className="flex flex-col min-[446px]:flex-row gap-2 min-[446px]:gap-4 w-full lg:w-auto items-center">
           {!archiveMode && viewMode === 'manual' && (
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-full min-[446px]:w-auto justify-center"
+              className="flex items-center gap-2 px-4 py-2 bg-[var(--color-brand-orange)] text-white rounded-lg hover:bg-[#e06c17] transition-colors w-full min-[446px]:w-auto justify-center"
             >
               <PlusCircle size={18} />
               O'quvchi qo'shish
@@ -311,7 +311,7 @@ export default function Students({ archiveMode = false }) {
           <select 
             value={filterCourse}
             onChange={(e) => setFilterCourse(e.target.value)}
-            className="border border-gray-300 rounded-lg p-2 outline-none focus:border-blue-500 bg-white w-full min-[446px]:w-auto"
+            className="border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)] bg-[var(--color-panel-dark)] w-full min-[446px]:w-auto"
           >
             <option value="all">Barcha kurslar</option>
             {courses.map(c => (
@@ -322,24 +322,24 @@ export default function Students({ archiveMode = false }) {
             <input 
               type="text" 
               placeholder="Ism bo'yicha qidiruv..." 
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg outline-none focus:border-blue-500 w-full min-[446px]:w-64 bg-white"
+              className="pl-10 pr-4 py-2 border border-[var(--color-border-dark)] rounded-lg outline-none focus:border-[var(--color-brand-orange)] w-full min-[446px]:w-64 bg-[var(--color-panel-dark)]"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <Search size={18} className="absolute left-3 top-2.5 text-gray-400" />
+            <Search size={18} className="absolute left-3 top-2.5 text-[#64748b]" />
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden w-full">
+      <div className="bg-[var(--color-panel-dark)] rounded-xl shadow-sm border border-[var(--color-border-dark)] overflow-hidden w-full">
         <div className="overflow-x-auto w-full">
           <table className="w-full text-left border-collapse whitespace-nowrap min-w-[700px]">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="p-4 font-medium text-gray-600 w-12">
+              <tr className="bg-[var(--color-bg-dark)] border-b border-[var(--color-border-dark)]">
+                <th className="p-4 font-medium text-[var(--color-text-muted)] w-12">
                   <input 
                     type="checkbox" 
-                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                    className="w-4 h-4 rounded border-[var(--color-border-dark)] text-[var(--color-brand-orange)] focus:ring-blue-500 cursor-pointer"
                     checked={filteredStudents.length > 0 && selectedIds.length === filteredStudents.length}
                     onChange={(e) => {
                       if (e.target.checked) {
@@ -350,16 +350,16 @@ export default function Students({ archiveMode = false }) {
                     }}
                   />
                 </th>
-                <th className="p-4 font-medium text-gray-600">O'quvchi</th>
-                <th className="p-4 font-medium text-gray-600">O'qiyotgan Kursi</th>
-                <th className="p-4 font-medium text-gray-600">Taklif qildi (Inviter)</th>
-                <th className="p-4 font-medium text-gray-600">Referal Statusi</th>
-                <th className="p-4 font-medium text-gray-600 text-right">Harakatlar</th>
+                <th className="p-4 font-medium text-[var(--color-text-muted)]">O'quvchi</th>
+                <th className="p-4 font-medium text-[var(--color-text-muted)]">O'qiyotgan Kursi</th>
+                <th className="p-4 font-medium text-[var(--color-text-muted)]">Taklif qildi (Inviter)</th>
+                <th className="p-4 font-medium text-[var(--color-text-muted)]">Referal Statusi</th>
+                <th className="p-4 font-medium text-[var(--color-text-muted)] text-right">Harakatlar</th>
               </tr>
             </thead>
             <tbody>
               {filteredStudents.length === 0 ? (
-                <tr><td colSpan="6" className="p-8 text-center text-gray-500">Hech qanday ma'lumot topilmadi</td></tr>
+                <tr><td colSpan="6" className="p-8 text-center text-[var(--color-text-muted)]">Hech qanday ma'lumot topilmadi</td></tr>
               ) : (
                 filteredStudents.map(student => {
                   const refInfo = student.referral_info && student.referral_info.length > 0 
@@ -378,11 +378,11 @@ export default function Students({ archiveMode = false }) {
                   }
 
                   return (
-                    <tr key={student.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
+                    <tr key={student.id} className="border-b border-[var(--color-border-dark)] last:border-0 hover:bg-[var(--color-bg-dark)]">
                       <td className="p-4">
                         <input 
                           type="checkbox" 
-                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                          className="w-4 h-4 rounded border-[var(--color-border-dark)] text-[var(--color-brand-orange)] focus:ring-blue-500 cursor-pointer"
                           checked={selectedIds.includes(student.id)}
                           onChange={(e) => {
                             if (e.target.checked) {
@@ -401,24 +401,24 @@ export default function Students({ archiveMode = false }) {
                             </span>
                           </div>
                         ) : (
-                          <p className="font-medium text-gray-900">{student.full_name}</p>
+                          <p className="font-medium text-[var(--color-text-main)]">{student.full_name}</p>
                         )}
-                        <p className="text-sm text-gray-500 mt-0.5">
-                          {student.phone ? student.phone : <span className="text-gray-400 text-xs">ID: {student.telegram_id}</span>}
+                        <p className="text-sm text-[var(--color-text-muted)] mt-0.5">
+                          {student.phone ? student.phone : <span className="text-[#64748b] text-xs">ID: {student.telegram_id}</span>}
                         </p>
                       </td>
                       <td className="p-4">
                         {courseNames.length > 0 && (
                           <div className="flex flex-wrap gap-1 mb-2">
                             {courseNames.map((cName, i) => (
-                              <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-md border border-blue-100">
+                              <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-[var(--color-brand-orange)]/10 text-blue-700 text-xs font-medium rounded-md border border-blue-100">
                                 <Book size={12} /> {cName}
                               </span>
                             ))}
                           </div>
                         )}
                         <select 
-                          className="border border-gray-300 rounded p-1 outline-none text-xs bg-gray-50 w-full hover:border-blue-400 transition-colors min-w-[120px]"
+                          className="border border-[var(--color-border-dark)] rounded p-1 outline-none text-xs bg-[var(--color-bg-dark)] w-full hover:border-blue-400 transition-colors min-w-[120px]"
                           value="" // Doim bo'sh turadi, chunki bu faqat harakat (action)
                           onChange={(e) => handleEnrollClick(student, e.target.value)}
                         >
@@ -430,9 +430,9 @@ export default function Students({ archiveMode = false }) {
                       </td>
                       <td className="p-4">
                         {refInfo ? (
-                           <p className="font-medium text-blue-600">{refInfo.inviter?.full_name}</p>
+                           <p className="font-medium text-[var(--color-brand-orange)]">{refInfo.inviter?.full_name}</p>
                         ) : (
-                           <span className="text-gray-400 italic text-sm">
+                           <span className="text-[#64748b] italic text-sm">
                              {(student.referral_code?.startsWith('MANUAL_') || (!student.referral_code?.startsWith('REF_') && student.telegram_id === null)) ? "Qo'lda qo'shilgan" : "O'zi kelgan"}
                            </span>
                         )}
@@ -440,7 +440,7 @@ export default function Students({ archiveMode = false }) {
                       <td className="p-4">
                         {refInfo ? (
                           <select 
-                            className="border border-gray-300 rounded p-1 outline-none text-sm bg-white"
+                            className="border border-[var(--color-border-dark)] rounded p-1 outline-none text-sm bg-[var(--color-panel-dark)]"
                             value={refInfo.status}
                             onChange={(e) => handleStatusChange(refInfo.id, e.target.value)}
                           >
@@ -456,21 +456,21 @@ export default function Students({ archiveMode = false }) {
                         <div className="flex gap-2 justify-end">
                           <button
                               onClick={() => handleCopyLink(student)}
-                              className={`p-2 rounded transition-colors ${student.telegram_id !== null ? 'text-green-500 hover:bg-green-50' : 'text-gray-400 hover:text-purple-600 hover:bg-purple-50'}`}
+                              className={`p-2 rounded transition-colors ${student.telegram_id !== null ? 'text-green-500 hover:bg-green-50' : 'text-[#64748b] hover:text-purple-600 hover:bg-purple-50'}`}
                               title={student.telegram_id !== null ? "Botga ulangan" : "Botga ulash havolasini nusxalash"}
                           >
                               <LinkIcon size={18} />
                           </button>
                           <button 
                             onClick={() => handleViewInvites(student)} 
-                            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                            className="p-2 text-[#64748b] hover:text-green-600 hover:bg-green-50 rounded transition-colors"
                             title="Taklif qilgan o'quvchilarini ko'rish"
                           >
                             <Eye size={18} />
                           </button>
                           <button 
                             onClick={() => setEditingStudent({...student, phone: student.phone || ''})} 
-                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                            className="p-2 text-[#64748b] hover:text-[var(--color-brand-orange)] hover:bg-[var(--color-brand-orange)]/10 rounded transition-colors"
                             title="O'quvchini tahrirlash"
                           >
                             <Edit2 size={18} />
@@ -491,7 +491,7 @@ export default function Students({ archiveMode = false }) {
                                 setConfirmDialog(null);
                               }
                             })}
-                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                            className="p-2 text-[#64748b] hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                             title="O'quvchini butunlay o'chirish"
                           >
                             <Trash2 size={18} />
@@ -512,61 +512,61 @@ export default function Students({ archiveMode = false }) {
       {/* Kursga qo'shish (Enroll) Modali va Skidka hisoblash */}
       {enrollData && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-md">
-            <div className="p-6 border-b border-gray-200">
+          <div className="bg-[var(--color-panel-dark)] rounded-xl shadow-lg w-full max-w-md">
+            <div className="p-6 border-b border-[var(--color-border-dark)]">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-[var(--color-brand-orange)]/20 text-[var(--color-brand-orange)] rounded-full flex items-center justify-center">
                   <PlusCircle size={24} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900">Kursga qo'shish</h3>
-                  <p className="text-sm text-gray-500">To'lov va chegirma hisob-kitobi</p>
+                  <h3 className="text-xl font-bold text-[var(--color-text-main)]">Kursga qo'shish</h3>
+                  <p className="text-sm text-[var(--color-text-muted)]">To'lov va chegirma hisob-kitobi</p>
                 </div>
               </div>
             </div>
             
             <div className="p-6 space-y-4">
-              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <div className="bg-[var(--color-bg-dark)] p-4 rounded-lg border border-[var(--color-border-dark)]">
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-600">O'quvchi:</span>
-                  <span className="font-medium text-gray-900">{enrollData.student.full_name}</span>
+                  <span className="text-[var(--color-text-muted)]">O'quvchi:</span>
+                  <span className="font-medium text-[var(--color-text-main)]">{enrollData.student.full_name}</span>
                 </div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-600">Tanlangan kurs:</span>
-                  <span className="font-medium text-blue-600">{enrollData.course.title}</span>
+                  <span className="text-[var(--color-text-muted)]">Tanlangan kurs:</span>
+                  <span className="font-medium text-[var(--color-brand-orange)]">{enrollData.course.title}</span>
                 </div>
-                <div className="flex justify-between text-sm pt-2 border-t border-gray-200">
-                  <span className="text-gray-600">Faol takliflari (odam):</span>
-                  <span className="font-bold text-gray-900">{enrollData.activeCount} ta</span>
+                <div className="flex justify-between text-sm pt-2 border-t border-[var(--color-border-dark)]">
+                  <span className="text-[var(--color-text-muted)]">Faol takliflari (odam):</span>
+                  <span className="font-bold text-[var(--color-text-main)]">{enrollData.activeCount} ta</span>
                 </div>
               </div>
 
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Kursning asl narxi:</span>
-                  <span className="text-gray-500 line-through">{enrollData.basePrice.toLocaleString()} so'm</span>
+                  <span className="text-[var(--color-text-muted)]">Kursning asl narxi:</span>
+                  <span className="text-[var(--color-text-muted)] line-through">{enrollData.basePrice.toLocaleString()} so'm</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-green-600 font-medium">Takliflar uchun chegirma:</span>
                   <span className="text-green-600 font-bold">-{enrollData.discountPercent}%</span>
                 </div>
-                <div className="flex justify-between text-lg pt-3 border-t border-gray-200">
-                  <span className="font-bold text-gray-900">To'lashi kerak:</span>
-                  <span className="font-bold text-blue-600">{enrollData.finalPrice.toLocaleString()} so'm</span>
+                <div className="flex justify-between text-lg pt-3 border-t border-[var(--color-border-dark)]">
+                  <span className="font-bold text-[var(--color-text-main)]">To'lashi kerak:</span>
+                  <span className="font-bold text-[var(--color-brand-orange)]">{enrollData.finalPrice.toLocaleString()} so'm</span>
                 </div>
               </div>
             </div>
 
-            <div className="p-4 border-t border-gray-200 flex gap-3 justify-end bg-gray-50 rounded-b-xl">
+            <div className="p-4 border-t border-[var(--color-border-dark)] flex gap-3 justify-end bg-[var(--color-bg-dark)] rounded-b-xl">
               <button 
                 onClick={() => setEnrollData(null)}
-                className="px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+                className="px-4 py-2 text-[var(--color-text-muted)] bg-[var(--color-panel-dark)] border border-[var(--color-border-dark)] rounded-lg hover:bg-[var(--color-bg-dark)] font-medium transition-colors"
               >
                 Bekor qilish
               </button>
               <button 
                 onClick={confirmEnroll}
-                className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 font-medium transition-colors"
+                className="px-4 py-2 text-white bg-[var(--color-brand-orange)] rounded-lg hover:bg-[#e06c17] font-medium transition-colors"
               >
                 Tasdiqlash va Qo'shish
               </button>
@@ -578,21 +578,21 @@ export default function Students({ archiveMode = false }) {
       {/* Ko'rish (View/Invites) Modali */}
       {isViewModalOpen && selectedStudent && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-2xl max-h-[80vh] flex flex-col">
-            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+          <div className="bg-[var(--color-panel-dark)] rounded-xl shadow-lg w-full max-w-2xl max-h-[80vh] flex flex-col">
+            <div className="p-6 border-b border-[var(--color-border-dark)] flex justify-between items-center">
               <div>
-                <h3 className="text-xl font-bold text-gray-900">{selectedStudent.full_name}</h3>
-                <p className="text-sm text-gray-500">Taklif qilgan o'quvchilari va skidkasi</p>
+                <h3 className="text-xl font-bold text-[var(--color-text-main)]">{selectedStudent.full_name}</h3>
+                <p className="text-sm text-[var(--color-text-muted)]">Taklif qilgan o'quvchilari va skidkasi</p>
               </div>
-              <button onClick={() => setIsViewModalOpen(false)} className="text-gray-400 hover:bg-gray-100 p-2 rounded-lg">
+              <button onClick={() => setIsViewModalOpen(false)} className="text-[#64748b] hover:bg-[#1e262c] p-2 rounded-lg">
                 <X size={24} />
               </button>
             </div>
             
             <div className="p-6 overflow-y-auto">
               <div className="flex gap-4 mb-6">
-                <div className="bg-blue-50 p-4 rounded-lg flex-1 border border-blue-100">
-                  <p className="text-sm text-blue-600 font-medium mb-1">Jami taklif qilinganlar</p>
+                <div className="bg-[var(--color-brand-orange)]/10 p-4 rounded-lg flex-1 border border-blue-100">
+                  <p className="text-sm text-[var(--color-brand-orange)] font-medium mb-1">Jami taklif qilinganlar</p>
                   <p className="text-2xl font-bold text-blue-900">{invitedList.length} ta</p>
                 </div>
                 <div className="bg-green-50 p-4 rounded-lg flex-1 border border-green-100">
@@ -603,20 +603,20 @@ export default function Students({ archiveMode = false }) {
                 </div>
               </div>
 
-              <h4 className="font-bold text-gray-900 mb-4">Taklif qilingan o'quvchilar ro'yxati:</h4>
+              <h4 className="font-bold text-[var(--color-text-main)] mb-4">Taklif qilingan o'quvchilar ro'yxati:</h4>
               
               {invitedList.length === 0 ? (
-                <p className="text-gray-500 text-center py-4 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                <p className="text-[var(--color-text-muted)] text-center py-4 bg-[var(--color-bg-dark)] rounded-lg border border-dashed border-[var(--color-border-dark)]">
                   Ushbu o'quvchi hali hech kimni taklif qilmagan.
                 </p>
               ) : (
                 <div className="space-y-3">
                   {invitedList.map(invite => (
-                    <div key={invite.id} className="flex justify-between items-center p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
+                    <div key={invite.id} className="flex justify-between items-center p-4 border border-[var(--color-border-dark)] rounded-lg hover:border-blue-300 transition-colors">
                       <div>
-                        <p className="font-medium text-gray-900">{invite.referee?.full_name}</p>
-                        <p className="text-sm text-gray-500">{invite.referee?.phone}</p>
-                        <p className="text-xs text-blue-600 mt-1">{invite.course?.title || "Kurs tanlanmagan"}</p>
+                        <p className="font-medium text-[var(--color-text-main)]">{invite.referee?.full_name}</p>
+                        <p className="text-sm text-[var(--color-text-muted)]">{invite.referee?.phone}</p>
+                        <p className="text-xs text-[var(--color-brand-orange)] mt-1">{invite.course?.title || "Kurs tanlanmagan"}</p>
                       </div>
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                         invite.status === 'active' ? 'bg-green-100 text-green-700' : 
@@ -631,7 +631,7 @@ export default function Students({ archiveMode = false }) {
               )}
             </div>
             
-            <div className="p-4 border-t border-gray-200 text-right bg-gray-50 rounded-b-xl">
+            <div className="p-4 border-t border-[var(--color-border-dark)] text-right bg-[var(--color-bg-dark)] rounded-b-xl">
               <button 
                 onClick={() => setIsViewModalOpen(false)}
                 className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors"
@@ -646,42 +646,42 @@ export default function Students({ archiveMode = false }) {
       {/* Yangi o'quvchi qo'shish Modali */}
       {isAddModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-md">
-            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="text-xl font-bold text-gray-900">Yangi o'quvchi qo'shish</h3>
-              <button onClick={() => setIsAddModalOpen(false)} className="text-gray-400 hover:bg-gray-100 p-2 rounded-lg">
+          <div className="bg-[var(--color-panel-dark)] rounded-xl shadow-lg w-full max-w-md">
+            <div className="p-6 border-b border-[var(--color-border-dark)] flex justify-between items-center">
+              <h3 className="text-xl font-bold text-[var(--color-text-main)]">Yangi o'quvchi qo'shish</h3>
+              <button onClick={() => setIsAddModalOpen(false)} className="text-[#64748b] hover:bg-[#1e262c] p-2 rounded-lg">
                 <X size={20} />
               </button>
             </div>
             <form onSubmit={handleAddStudent} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Ism va Familiya</label>
+                <label className="block text-sm font-medium text-[var(--color-text-main)] mb-1">Ism va Familiya</label>
                 <input 
                   type="text" 
                   required
-                  className="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-blue-500"
+                  className="w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)]"
                   value={newStudentData.full_name}
                   onChange={(e) => setNewStudentData({...newStudentData, full_name: e.target.value})}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Telefon raqam</label>
+                <label className="block text-sm font-medium text-[var(--color-text-main)] mb-1">Telefon raqam</label>
                 <input 
                   type="text" 
                   required
-                  className="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-blue-500"
+                  className="w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)]"
                   value={newStudentData.phone}
                   onChange={(e) => setNewStudentData({...newStudentData, phone: e.target.value})}
                 />
               </div>
               
-              <div className="pt-2 border-t border-gray-200 mt-2">
-                <p className="text-sm font-semibold text-gray-700 mb-2">Referal ma'lumotlari (Ixtiyoriy)</p>
+              <div className="pt-2 border-t border-[var(--color-border-dark)] mt-2">
+                <p className="text-sm font-semibold text-[var(--color-text-main)] mb-2">Referal ma'lumotlari (Ixtiyoriy)</p>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">Kim taklif qildi?</label>
+                    <label className="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Kim taklif qildi?</label>
                     <select 
-                      className="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-blue-500 text-sm"
+                      className="w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)] text-sm"
                       value={newStudentData.inviter_id}
                       onChange={(e) => setNewStudentData({...newStudentData, inviter_id: e.target.value})}
                     >
@@ -695,9 +695,9 @@ export default function Students({ archiveMode = false }) {
                   {newStudentData.inviter_id && (
                     <>
                       <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">Qaysi kursga taklif qildi?</label>
+                        <label className="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Qaysi kursga taklif qildi?</label>
                         <select 
-                          className="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-blue-500 text-sm"
+                          className="w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)] text-sm"
                           value={newStudentData.course_id}
                           onChange={(e) => setNewStudentData({...newStudentData, course_id: e.target.value})}
                           required={!!newStudentData.inviter_id}
@@ -709,9 +709,9 @@ export default function Students({ archiveMode = false }) {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">Referal holati</label>
+                        <label className="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Referal holati</label>
                         <select 
-                          className="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-blue-500 text-sm"
+                          className="w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)] text-sm"
                           value={newStudentData.status}
                           onChange={(e) => setNewStudentData({...newStudentData, status: e.target.value})}
                         >
@@ -725,10 +725,10 @@ export default function Students({ archiveMode = false }) {
                 </div>
               </div>
               <div className="pt-4 flex gap-3 justify-end">
-                <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 font-medium">
+                <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 text-[var(--color-text-muted)] bg-[#1e262c] rounded-lg hover:bg-gray-200 font-medium">
                   Bekor qilish
                 </button>
-                <button type="submit" className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 font-medium">
+                <button type="submit" className="px-4 py-2 text-white bg-[var(--color-brand-orange)] rounded-lg hover:bg-[#e06c17] font-medium">
                   Qo'shish
                 </button>
               </div>
@@ -740,39 +740,39 @@ export default function Students({ archiveMode = false }) {
       {/* Tahrirlash (Edit) Modali */}
       {editingStudent && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-md">
-            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="text-xl font-bold text-gray-900">O'quvchini tahrirlash</h3>
-              <button onClick={() => setEditingStudent(null)} className="text-gray-400 hover:bg-gray-100 p-2 rounded-lg">
+          <div className="bg-[var(--color-panel-dark)] rounded-xl shadow-lg w-full max-w-md">
+            <div className="p-6 border-b border-[var(--color-border-dark)] flex justify-between items-center">
+              <h3 className="text-xl font-bold text-[var(--color-text-main)]">O'quvchini tahrirlash</h3>
+              <button onClick={() => setEditingStudent(null)} className="text-[#64748b] hover:bg-[#1e262c] p-2 rounded-lg">
                 <X size={20} />
               </button>
             </div>
             <form onSubmit={handleSaveEdit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Ism va Familiya</label>
+                <label className="block text-sm font-medium text-[var(--color-text-main)] mb-1">Ism va Familiya</label>
                 <input 
                   type="text" 
                   required
-                  className="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-blue-500"
+                  className="w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)]"
                   value={editingStudent.full_name}
                   onChange={(e) => setEditingStudent({...editingStudent, full_name: e.target.value})}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Telefon raqam</label>
+                <label className="block text-sm font-medium text-[var(--color-text-main)] mb-1">Telefon raqam</label>
                 <input 
                   type="text" 
                   required
-                  className="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-blue-500"
+                  className="w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)]"
                   value={editingStudent.phone}
                   onChange={(e) => setEditingStudent({...editingStudent, phone: e.target.value})}
                 />
               </div>
               <div className="pt-4 flex gap-3 justify-end">
-                <button type="button" onClick={() => setEditingStudent(null)} className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 font-medium">
+                <button type="button" onClick={() => setEditingStudent(null)} className="px-4 py-2 text-[var(--color-text-muted)] bg-[#1e262c] rounded-lg hover:bg-gray-200 font-medium">
                   Bekor qilish
                 </button>
-                <button type="submit" className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 font-medium">
+                <button type="submit" className="px-4 py-2 text-white bg-[var(--color-brand-orange)] rounded-lg hover:bg-[#e06c17] font-medium">
                   Saqlash
                 </button>
               </div>
@@ -784,14 +784,14 @@ export default function Students({ archiveMode = false }) {
       {/* O'chirish (Delete) Modali */}
       {confirmDialog && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-sm text-center p-6">
+          <div className="bg-[var(--color-panel-dark)] rounded-xl shadow-lg w-full max-w-sm text-center p-6">
             <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertTriangle size={32} />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">{confirmDialog.title}</h3>
-            <p className="text-gray-500 mb-6">{confirmDialog.message}</p>
+            <h3 className="text-xl font-bold text-[var(--color-text-main)] mb-2">{confirmDialog.title}</h3>
+            <p className="text-[var(--color-text-muted)] mb-6">{confirmDialog.message}</p>
             <div className="flex gap-3 justify-center">
-              <button onClick={() => setConfirmDialog(null)} className="px-6 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 font-medium w-full">
+              <button onClick={() => setConfirmDialog(null)} className="px-6 py-2 text-[var(--color-text-muted)] bg-[#1e262c] rounded-lg hover:bg-gray-200 font-medium w-full">
                 Yo'q
               </button>
               <button onClick={confirmDialog.onConfirm} className="px-6 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 font-medium w-full">

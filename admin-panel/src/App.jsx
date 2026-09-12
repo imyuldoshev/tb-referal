@@ -28,17 +28,17 @@ function Sidebar({ onLogout, isOpen, onClose }) {
       )}
 
       {/* Sidebar Container */}
-      <div className={`w-64 bg-white h-screen border-r border-gray-200 fixed left-0 top-0 flex flex-col z-50 transform transition-transform duration-300 ease-in-out ${
+      <div className={`w-64 bg-[var(--color-panel-dark)] h-screen border-r border-[var(--color-border-dark)] fixed left-0 top-0 flex flex-col z-50 transform transition-transform duration-300 ease-in-out ${
         isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
       }`}>
-        <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+        <div className="p-6 border-b border-[var(--color-border-dark)] flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-blue-600">TB Referal</h1>
-            <p className="text-sm text-gray-500">Admin Panel</p>
+            <h1 className="text-2xl font-bold text-[var(--color-brand-orange)]">TB Referal</h1>
+            <p className="text-sm text-[var(--color-text-muted)]">Admin Panel</p>
           </div>
           <button 
             onClick={onClose} 
-            className="md:hidden text-gray-500 hover:text-gray-800 focus:outline-none"
+            className="md:hidden text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] focus:outline-none"
           >
             <X size={24} />
           </button>
@@ -57,8 +57,8 @@ function Sidebar({ onLogout, isOpen, onClose }) {
               }}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                 location.pathname === link.path 
-                  ? 'bg-blue-50 text-blue-600 font-medium' 
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-[#f4722b]/10 text-[var(--color-brand-orange)] font-medium' 
+                  : 'text-[var(--color-text-muted)] hover:bg-[#1e262c] hover:text-[var(--color-text-main)]'
               }`}
             >
               {link.icon}
@@ -66,10 +66,10 @@ function Sidebar({ onLogout, isOpen, onClose }) {
             </Link>
           ))}
         </nav>
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-[var(--color-border-dark)]">
           <button 
             onClick={onLogout}
-            className="flex w-full items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
+            className="flex w-full items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors font-medium"
           >
             <LogOut size={20} />
             Chiqish
@@ -131,8 +131,14 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Toaster position="top-right" />
-      <div className="flex bg-gray-50 min-h-screen font-sans">
+      <Toaster position="top-right" toastOptions={{
+        style: {
+          background: 'var(--color-panel-dark)',
+          color: 'var(--color-text-main)',
+          border: '1px solid var(--color-border-dark)'
+        }
+      }} />
+      <div className="flex bg-[var(--color-bg-dark)] min-h-screen font-sans text-[var(--color-text-main)]">
         <Sidebar 
           onLogout={handleLogout} 
           isOpen={isSidebarOpen} 
@@ -141,14 +147,14 @@ function App() {
         
         <div className="flex-1 md:ml-64 flex flex-col min-h-screen transition-all duration-300 w-full overflow-x-hidden">
           {/* Mobile Header */}
-          <div className="md:hidden bg-white px-4 py-3 border-b border-gray-200 flex items-center sticky top-0 z-30 shadow-sm">
+          <div className="md:hidden bg-[var(--color-panel-dark)] px-4 py-3 border-b border-[var(--color-border-dark)] flex items-center sticky top-0 z-30 shadow-sm">
             <button 
               onClick={() => setIsSidebarOpen(true)}
-              className="text-gray-600 hover:text-gray-900 focus:outline-none p-1 -ml-1 rounded-md"
+              className="text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] focus:outline-none p-1 -ml-1 rounded-md"
             >
               <Menu size={26} />
             </button>
-            <h1 className="ml-3 text-lg font-bold text-blue-600">TB Referal</h1>
+            <h1 className="ml-3 text-lg font-bold text-[var(--color-brand-orange)]">TB Referal</h1>
           </div>
 
           <div className="p-4 sm:p-6 md:p-8 flex-1">
