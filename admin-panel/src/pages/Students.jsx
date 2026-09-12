@@ -281,11 +281,11 @@ export default function Students({ archiveMode = false }) {
           </div>
           <p className="text-xs min-[446px]:text-sm text-[var(--color-text-muted)] mt-1">{archiveMode ? "Ro'yxatdan o'tishni tugallamagan talabalar" : "Talabalar ro'yxati va ularning taklif holati"}</p>
         </div>
-        <div className="flex flex-col min-[446px]:flex-row gap-2 min-[446px]:gap-4 w-full lg:w-auto items-center min-h-[42px] transition-all duration-300 relative">
-          {!archiveMode && viewMode === 'manual' && (
+        <div className="flex flex-col min-[446px]:flex-row flex-wrap gap-2 min-[446px]:gap-4 w-full lg:w-auto items-center min-h-[42px] transition-all duration-300 relative">
+          {!archiveMode && viewMode === 'manual' && selectedIds.length === 0 && (
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-[var(--color-brand-orange)] text-white rounded-lg hover:bg-[#e06c17] transition-all duration-300 w-full min-[446px]:w-auto justify-center animate-in zoom-in-95"
+              className="flex items-center gap-2 px-4 py-2 bg-[var(--color-brand-orange)] text-white rounded-lg hover:bg-[#e06c17] transition-all duration-300 w-full min-[446px]:w-auto justify-center animate-in zoom-in-95 whitespace-nowrap shrink-0"
             >
               <PlusCircle size={18} />
               O'quvchi qo'shish
@@ -294,7 +294,7 @@ export default function Students({ archiveMode = false }) {
           {selectedIds.length > 0 && (
             <button
               onClick={handleBulkDelete}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-300 animate-in zoom-in-95"
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-300 animate-in zoom-in-95 whitespace-nowrap shrink-0"
             >
               <Trash2 size={18} />
               Tanlanganlarni o'chirish ({selectedIds.length})
@@ -303,7 +303,7 @@ export default function Students({ archiveMode = false }) {
           {archiveMode && (
             <button
               onClick={handleClearArchive}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-300 animate-in zoom-in-95"
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-300 animate-in zoom-in-95 whitespace-nowrap shrink-0"
             >
               <Trash2 size={18} />
               Barchasini tozalash
