@@ -440,15 +440,13 @@ export default function Students({ archiveMode = false }) {
                       </td>
                       <td className="p-4 text-right">
                         <div className="flex gap-2 justify-end">
-                          {student.telegram_id === null && (
-                            <button
-                                onClick={() => handleCopyLink(student.id)}
-                                className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
-                                title="Botga ulash havolasini nusxalash"
-                            >
-                                <LinkIcon size={18} />
-                            </button>
-                          )}
+                          <button
+                              onClick={() => handleCopyLink(student.id)}
+                              className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
+                              title="Botga ulash havolasini nusxalash"
+                          >
+                              <LinkIcon size={18} />
+                          </button>
                           <button 
                             onClick={() => handleViewInvites(student)} 
                             className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
