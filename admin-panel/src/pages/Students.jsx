@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api';
-import { Search, Trash2, Edit2, X, Eye, AlertTriangle, Book, PlusCircle, Users } from 'lucide-react';
+import { Search, Trash2, Edit2, X, Eye, AlertTriangle, Book, PlusCircle, Users, Link as LinkIcon } from 'lucide-react';
 
 export default function Students({ archiveMode = false }) {
   const [students, setStudents] = useState([]);
@@ -41,14 +41,18 @@ export default function Students({ archiveMode = false }) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newStudentData, setNewStudentData] = useState({ full_name: '', phone: '', inviter_id: '', course_id: '', status: 'pending' });
 
+  const [botUsername, setBotUsername] = useState('');
+
   const fetchData = async () => {
     try {
-      const [studentsRes, coursesRes] = await Promise.all([
+      const [studentsRes, coursesRes, botRes] = await Promise.all([
         api.get('/students_full'),
-        api.get('/courses')
+        api.get('/courses'),
+        api.get('/bot-info').catch(() => ({ data: { username: '' } }))
       ]);
       setStudents(studentsRes.data);
       setCourses(coursesRes.data);
+      if (botRes.data?.username) setBotUsername(botRes.data.username);
     } catch (err) {
       console.error(err);
     }
@@ -110,6 +114,12 @@ export default function Students({ archiveMode = false }) {
     } catch (err) {
       alert("Xatolik: " + err.message);
     }
+  };
+
+  const handleCopyLink = (studentId) => {
+    const link = botUsername ? `https://t.me/${botUsername}?start=LINK_${studentId}` : `LINK_${studentId}`;
+    navigator.clipboard.writeText(link);
+    alert(`O'quvchini botga ulash havolasi nusxalandi:\n${link}\n\nUshbu havolani o'quvchiga yuboring. U havolaga kirib START bossa botga ulanadi.`);
   };
 
   const handleSaveEdit = async (e) => {
@@ -426,7 +436,16 @@ export default function Students({ archiveMode = false }) {
                         )}
                       </td>
                       <td className="p-4 text-right">
-                        <div className="flex items-center justify-end gap-1">
+                        <div className="flex gap-2 justify-end">
+                          {student.telegram_id === null && (
+                            <button
+                                onClick={() => handleCopyLink(student.id)}
+                                className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
+                                title="Botga ulash havolasini nusxalash"
+                            >
+                                <LinkIcon size={18} />
+                            </button>
+                          )}
                           <button 
                             onClick={() => handleViewInvites(student)} 
                             className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"

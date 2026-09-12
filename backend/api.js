@@ -216,6 +216,16 @@ router.post('/students_manual', async (req, res) => {
     res.json(newStudent);
 });
 
+// GET /api/bot-info
+router.get('/bot-info', async (req, res) => {
+    try {
+        const botInfo = await bot.api.getMe();
+        res.json({ username: botInfo.username });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // PATCH /api/referrals/:id - Referal statusini o'zgartirish (va kursga biriktirish)
 router.patch('/referrals/:id', async (req, res) => {
     const { id } = req.params;

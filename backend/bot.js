@@ -19,6 +19,28 @@ bot.command('start', async (ctx) => {
     const inviterCode = ctx.match; 
 
     try {
+        if (inviterCode && inviterCode.startsWith('LINK_')) {
+            const manualStudentId = inviterCode.replace('LINK_', '');
+            const { data: manualStudent } = await supabase.from('students').select('*').eq('id', manualStudentId).single();
+            if (manualStudent) {
+                if (manualStudent.telegram_id !== null) {
+                    await ctx.reply("Bu akkaunt allaqachon botga ulangan!");
+                    return;
+                }
+                // O'chirib tashlaymiz agarda ushbu user avval /start ni bosgan bo'lsa
+                await supabase.from('students').delete().eq('telegram_id', telegramId);
+                // Manualni yangilaymiz
+                await supabase.from('students').update({ telegram_id: telegramId }).eq('id', manualStudentId);
+                
+                await ctx.reply(`Tabriklaymiz, ${manualStudent.full_name}! Sizning akkauntingiz botga muvaffaqiyatli ulandi.`);
+                await showMainMenu(ctx);
+                return;
+            } else {
+                await ctx.reply("Bunday akkaunt topilmadi yoki xato havola.");
+                return;
+            }
+        }
+
         let { data: existingStudent } = await supabase
             .from('students')
             .select('*')
