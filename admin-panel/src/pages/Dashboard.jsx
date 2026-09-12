@@ -45,8 +45,7 @@ export default function Dashboard() {
         });
       } catch (err) {
         console.error("Xatolik:", err);
-      }
-    };
+      } finally { setIsLoading(false); } };
     
     fetchStats();
   }, []);

@@ -58,10 +58,7 @@ export default function Students({ archiveMode = false }) {
       if (botRes.data?.username) setBotUsername(botRes.data.username);
     } catch (err) {
       console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    } finally { setIsLoading(false); } };
 
   useEffect(() => {
     fetchData();

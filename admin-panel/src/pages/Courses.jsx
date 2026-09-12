@@ -20,8 +20,7 @@ export default function Courses() {
       setCourses(res.data);
     } catch (err) {
       console.error(err);
-    }
-  };
+    } finally { setIsLoading(false); } };
 
   useEffect(() => {
     fetchCourses();
@@ -40,9 +39,7 @@ export default function Courses() {
       toast.success("Kurs muvaffaqiyatli qo'shildi!");
     } catch (err) {
       toast.error("Xatolik: " + err.message);
-    } finally {
-      setIsLoading(false);
-    }
+    } 
   };
 
   const handleSaveEdit = async (e) => {
