@@ -319,10 +319,9 @@ export default function Students({ archiveMode = false }) {
             ))}
           </select>
           <div className="relative w-full min-[446px]:w-auto">
-            <input 
-              type="text" 
+            <input type="text" 
               placeholder="Ism bo'yicha qidiruv..." 
-              className="pl-10 pr-4 py-2 border border-[var(--color-border-dark)] rounded-lg outline-none focus:border-[var(--color-brand-orange)] w-full min-[446px]:w-64 bg-[var(--color-panel-dark)]"
+              className="bg-[var(--color-bg-dark)] text-[var(--color-text-main)] pl-10 pr-4 py-2 border border-[var(--color-border-dark)] rounded-lg outline-none focus:border-[var(--color-brand-orange)] w-full min-[446px]:w-64 bg-[var(--color-panel-dark)]"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -337,9 +336,8 @@ export default function Students({ archiveMode = false }) {
             <thead>
               <tr className="bg-[var(--color-bg-dark)] border-b border-[var(--color-border-dark)]">
                 <th className="p-4 font-medium text-[var(--color-text-muted)] w-12">
-                  <input 
-                    type="checkbox" 
-                    className="w-4 h-4 rounded border-[var(--color-border-dark)] text-[var(--color-brand-orange)] focus:ring-blue-500 cursor-pointer"
+                  <input type="checkbox" 
+                    className="bg-[var(--color-bg-dark)] text-[var(--color-text-main)] w-4 h-4 rounded border-[var(--color-border-dark)] text-[var(--color-brand-orange)] focus:ring-[var(--color-brand-orange)] accent-[var(--color-brand-orange)] cursor-pointer"
                     checked={filteredStudents.length > 0 && selectedIds.length === filteredStudents.length}
                     onChange={(e) => {
                       if (e.target.checked) {
@@ -380,9 +378,8 @@ export default function Students({ archiveMode = false }) {
                   return (
                     <tr key={student.id} className="border-b border-[var(--color-border-dark)] last:border-0 hover:bg-[var(--color-bg-dark)]">
                       <td className="p-4">
-                        <input 
-                          type="checkbox" 
-                          className="w-4 h-4 rounded border-[var(--color-border-dark)] text-[var(--color-brand-orange)] focus:ring-blue-500 cursor-pointer"
+                        <input type="checkbox" 
+                          className="bg-[var(--color-bg-dark)] text-[var(--color-text-main)] w-4 h-4 rounded border-[var(--color-border-dark)] text-[var(--color-brand-orange)] focus:ring-[var(--color-brand-orange)] accent-[var(--color-brand-orange)] cursor-pointer"
                           checked={selectedIds.includes(student.id)}
                           onChange={(e) => {
                             if (e.target.checked) {
@@ -396,7 +393,7 @@ export default function Students({ archiveMode = false }) {
                       <td className="p-4">
                         {student.full_name === 'pending' ? (
                           <div className="mb-1">
-                            <span className="inline-flex items-center px-2 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-md border border-amber-200">
+                            <span className="inline-flex items-center px-2 py-1 bg-amber-500/10 text-amber-500 text-xs font-semibold rounded-md border border-amber-500/30">
                               Ro'yxatdan o'tish tugallanmagan
                             </span>
                           </div>
@@ -411,14 +408,13 @@ export default function Students({ archiveMode = false }) {
                         {courseNames.length > 0 && (
                           <div className="flex flex-wrap gap-1 mb-2">
                             {courseNames.map((cName, i) => (
-                              <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-[var(--color-brand-orange)]/10 text-blue-700 text-xs font-medium rounded-md border border-blue-100">
+                              <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-[var(--color-brand-orange)]/10 text-[var(--color-text-main)] text-xs font-medium rounded-md border border-[var(--color-border-dark)]">
                                 <Book size={12} /> {cName}
                               </span>
                             ))}
                           </div>
                         )}
-                        <select 
-                          className="border border-[var(--color-border-dark)] rounded p-1 outline-none text-xs bg-[var(--color-bg-dark)] w-full hover:border-blue-400 transition-colors min-w-[120px]"
+                        <select className="bg-[var(--color-bg-dark)] text-[var(--color-text-main)] border border-[var(--color-border-dark)] rounded p-1 outline-none text-xs bg-[var(--color-bg-dark)] w-full hover:border-[var(--color-brand-orange)] transition-colors min-w-[120px]"
                           value="" // Doim bo'sh turadi, chunki bu faqat harakat (action)
                           onChange={(e) => handleEnrollClick(student, e.target.value)}
                         >
@@ -439,8 +435,7 @@ export default function Students({ archiveMode = false }) {
                       </td>
                       <td className="p-4">
                         {refInfo ? (
-                          <select 
-                            className="border border-[var(--color-border-dark)] rounded p-1 outline-none text-sm bg-[var(--color-panel-dark)]"
+                          <select className="bg-[var(--color-bg-dark)] text-[var(--color-text-main)] border border-[var(--color-border-dark)] rounded p-1 outline-none text-sm bg-[var(--color-panel-dark)]"
                             value={refInfo.status}
                             onChange={(e) => handleStatusChange(refInfo.id, e.target.value)}
                           >
@@ -449,21 +444,21 @@ export default function Students({ archiveMode = false }) {
                             <option value="left">Ketdi (Left)</option>
                           </select>
                         ) : (
-                          <span className="text-gray-300">-</span>
+                          <span className="text-[var(--color-text-muted)]">-</span>
                         )}
                       </td>
                       <td className="p-4 text-right">
                         <div className="flex gap-2 justify-end">
                           <button
                               onClick={() => handleCopyLink(student)}
-                              className={`p-2 rounded transition-colors ${student.telegram_id !== null ? 'text-green-500 hover:bg-green-50' : 'text-[#64748b] hover:text-purple-600 hover:bg-purple-50'}`}
+                              className={`p-2 rounded transition-colors ${student.telegram_id !== null ? 'text-green-500 hover:bg-green-500/10' : 'text-[#64748b] hover:text-purple-600 hover:bg-purple-500/10'}`}
                               title={student.telegram_id !== null ? "Botga ulangan" : "Botga ulash havolasini nusxalash"}
                           >
                               <LinkIcon size={18} />
                           </button>
                           <button 
                             onClick={() => handleViewInvites(student)} 
-                            className="p-2 text-[#64748b] hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                            className="p-2 text-[#64748b] hover:text-green-600 hover:bg-green-500/10 rounded transition-colors"
                             title="Taklif qilgan o'quvchilarini ko'rish"
                           >
                             <Eye size={18} />
@@ -491,7 +486,7 @@ export default function Students({ archiveMode = false }) {
                                 setConfirmDialog(null);
                               }
                             })}
-                            className="p-2 text-[#64748b] hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                            className="p-2 text-[#64748b] hover:text-red-600 hover:bg-red-500/10 rounded transition-colors"
                             title="O'quvchini butunlay o'chirish"
                           >
                             <Trash2 size={18} />
@@ -591,7 +586,7 @@ export default function Students({ archiveMode = false }) {
             
             <div className="p-6 overflow-y-auto">
               <div className="flex gap-4 mb-6">
-                <div className="bg-[var(--color-brand-orange)]/10 p-4 rounded-lg flex-1 border border-blue-100">
+                <div className="bg-[var(--color-brand-orange)]/10 p-4 rounded-lg flex-1 border border-[var(--color-border-dark)]">
                   <p className="text-sm text-[var(--color-brand-orange)] font-medium mb-1">Jami taklif qilinganlar</p>
                   <p className="text-2xl font-bold text-blue-900">{invitedList.length} ta</p>
                 </div>
@@ -620,7 +615,7 @@ export default function Students({ archiveMode = false }) {
                       </div>
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                         invite.status === 'active' ? 'bg-green-100 text-green-700' : 
-                        invite.status === 'left' ? 'bg-red-100 text-red-700' : 
+                        invite.status === 'left' ? 'bg-red-500/20 text-red-700' : 
                         'bg-yellow-100 text-yellow-700'
                       }`}>
                         {invite.status}
@@ -634,7 +629,7 @@ export default function Students({ archiveMode = false }) {
             <div className="p-4 border-t border-[var(--color-border-dark)] text-right bg-[var(--color-bg-dark)] rounded-b-xl">
               <button 
                 onClick={() => setIsViewModalOpen(false)}
-                className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors"
+                className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-[#1e262c] transition-colors"
               >
                 Yopish
               </button>
@@ -656,20 +651,18 @@ export default function Students({ archiveMode = false }) {
             <form onSubmit={handleAddStudent} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-[var(--color-text-main)] mb-1">Ism va Familiya</label>
-                <input 
-                  type="text" 
+                <input type="text" 
                   required
-                  className="w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)]"
+                  className="bg-[var(--color-bg-dark)] text-[var(--color-text-main)] w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)]"
                   value={newStudentData.full_name}
                   onChange={(e) => setNewStudentData({...newStudentData, full_name: e.target.value})}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-[var(--color-text-main)] mb-1">Telefon raqam</label>
-                <input 
-                  type="text" 
+                <input type="text" 
                   required
-                  className="w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)]"
+                  className="bg-[var(--color-bg-dark)] text-[var(--color-text-main)] w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)]"
                   value={newStudentData.phone}
                   onChange={(e) => setNewStudentData({...newStudentData, phone: e.target.value})}
                 />
@@ -680,8 +673,7 @@ export default function Students({ archiveMode = false }) {
                 <div className="space-y-3">
                   <div>
                     <label className="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Kim taklif qildi?</label>
-                    <select 
-                      className="w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)] text-sm"
+                    <select className="bg-[var(--color-bg-dark)] text-[var(--color-text-main)] w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)] text-sm"
                       value={newStudentData.inviter_id}
                       onChange={(e) => setNewStudentData({...newStudentData, inviter_id: e.target.value})}
                     >
@@ -696,8 +688,7 @@ export default function Students({ archiveMode = false }) {
                     <>
                       <div>
                         <label className="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Qaysi kursga taklif qildi?</label>
-                        <select 
-                          className="w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)] text-sm"
+                        <select className="bg-[var(--color-bg-dark)] text-[var(--color-text-main)] w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)] text-sm"
                           value={newStudentData.course_id}
                           onChange={(e) => setNewStudentData({...newStudentData, course_id: e.target.value})}
                           required={!!newStudentData.inviter_id}
@@ -710,8 +701,7 @@ export default function Students({ archiveMode = false }) {
                       </div>
                       <div>
                         <label className="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Referal holati</label>
-                        <select 
-                          className="w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)] text-sm"
+                        <select className="bg-[var(--color-bg-dark)] text-[var(--color-text-main)] w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)] text-sm"
                           value={newStudentData.status}
                           onChange={(e) => setNewStudentData({...newStudentData, status: e.target.value})}
                         >
@@ -725,7 +715,7 @@ export default function Students({ archiveMode = false }) {
                 </div>
               </div>
               <div className="pt-4 flex gap-3 justify-end">
-                <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 text-[var(--color-text-muted)] bg-[#1e262c] rounded-lg hover:bg-gray-200 font-medium">
+                <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 text-[var(--color-text-muted)] bg-[#1e262c] rounded-lg hover:bg-[#2d3741] font-medium">
                   Bekor qilish
                 </button>
                 <button type="submit" className="px-4 py-2 text-white bg-[var(--color-brand-orange)] rounded-lg hover:bg-[#e06c17] font-medium">
@@ -750,26 +740,24 @@ export default function Students({ archiveMode = false }) {
             <form onSubmit={handleSaveEdit} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-[var(--color-text-main)] mb-1">Ism va Familiya</label>
-                <input 
-                  type="text" 
+                <input type="text" 
                   required
-                  className="w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)]"
+                  className="bg-[var(--color-bg-dark)] text-[var(--color-text-main)] w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)]"
                   value={editingStudent.full_name}
                   onChange={(e) => setEditingStudent({...editingStudent, full_name: e.target.value})}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-[var(--color-text-main)] mb-1">Telefon raqam</label>
-                <input 
-                  type="text" 
+                <input type="text" 
                   required
-                  className="w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)]"
+                  className="bg-[var(--color-bg-dark)] text-[var(--color-text-main)] w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)]"
                   value={editingStudent.phone}
                   onChange={(e) => setEditingStudent({...editingStudent, phone: e.target.value})}
                 />
               </div>
               <div className="pt-4 flex gap-3 justify-end">
-                <button type="button" onClick={() => setEditingStudent(null)} className="px-4 py-2 text-[var(--color-text-muted)] bg-[#1e262c] rounded-lg hover:bg-gray-200 font-medium">
+                <button type="button" onClick={() => setEditingStudent(null)} className="px-4 py-2 text-[var(--color-text-muted)] bg-[#1e262c] rounded-lg hover:bg-[#2d3741] font-medium">
                   Bekor qilish
                 </button>
                 <button type="submit" className="px-4 py-2 text-white bg-[var(--color-brand-orange)] rounded-lg hover:bg-[#e06c17] font-medium">
@@ -785,13 +773,13 @@ export default function Students({ archiveMode = false }) {
       {confirmDialog && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-[var(--color-panel-dark)] rounded-xl shadow-lg w-full max-w-sm text-center p-6">
-            <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-red-500/20 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertTriangle size={32} />
             </div>
             <h3 className="text-xl font-bold text-[var(--color-text-main)] mb-2">{confirmDialog.title}</h3>
             <p className="text-[var(--color-text-muted)] mb-6">{confirmDialog.message}</p>
             <div className="flex gap-3 justify-center">
-              <button onClick={() => setConfirmDialog(null)} className="px-6 py-2 text-[var(--color-text-muted)] bg-[#1e262c] rounded-lg hover:bg-gray-200 font-medium w-full">
+              <button onClick={() => setConfirmDialog(null)} className="px-6 py-2 text-[var(--color-text-muted)] bg-[#1e262c] rounded-lg hover:bg-[#2d3741] font-medium w-full">
                 Yo'q
               </button>
               <button onClick={confirmDialog.onConfirm} className="px-6 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 font-medium w-full">

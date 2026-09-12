@@ -88,20 +88,18 @@ export default function Courses() {
           <form onSubmit={handleAddCourse} className="flex flex-col min-[446px]:flex-row gap-4 items-start min-[446px]:items-end">
             <div className="w-full min-[446px]:flex-1">
               <label className="block text-sm font-medium text-[var(--color-text-main)] mb-1">Kurs nomi</label>
-              <input 
-                type="text" 
+              <input type="text" 
                 required
-                className="w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)]"
+                className="bg-[var(--color-bg-dark)] text-[var(--color-text-main)] w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)]"
                 value={newCourse.title}
                 onChange={(e) => setNewCourse({...newCourse, title: e.target.value})}
               />
             </div>
             <div className="w-full min-[446px]:flex-1">
               <label className="block text-sm font-medium text-[var(--color-text-main)] mb-1">Narxi (so'm)</label>
-              <input 
-                type="number" 
+              <input type="number" 
                 required
-                className="w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)]"
+                className="bg-[var(--color-bg-dark)] text-[var(--color-text-main)] w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)]"
                 value={newCourse.price}
                 onChange={(e) => setNewCourse({...newCourse, price: e.target.value})}
               />
@@ -133,7 +131,7 @@ export default function Courses() {
               </button>
               <button 
                 onClick={() => setDeletingId(course.id)} 
-                className="p-2 text-[#64748b] hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                className="p-2 text-[#64748b] hover:text-red-600 hover:bg-red-500/10 rounded transition-colors"
                 title="O'chirish"
               >
                 <Trash2 size={18}/>
@@ -161,26 +159,24 @@ export default function Courses() {
             <form onSubmit={handleSaveEdit} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-[var(--color-text-main)] mb-1">Kurs nomi</label>
-                <input 
-                  type="text" 
+                <input type="text" 
                   required
-                  className="w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)]"
+                  className="bg-[var(--color-bg-dark)] text-[var(--color-text-main)] w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)]"
                   value={editingCourse.title}
                   onChange={(e) => setEditingCourse({...editingCourse, title: e.target.value})}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-[var(--color-text-main)] mb-1">Narxi (so'm)</label>
-                <input 
-                  type="number" 
+                <input type="number" 
                   required
-                  className="w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)]"
+                  className="bg-[var(--color-bg-dark)] text-[var(--color-text-main)] w-full border border-[var(--color-border-dark)] rounded-lg p-2 outline-none focus:border-[var(--color-brand-orange)]"
                   value={editingCourse.price}
                   onChange={(e) => setEditingCourse({...editingCourse, price: e.target.value})}
                 />
               </div>
               <div className="pt-4 flex gap-3 justify-end">
-                <button type="button" onClick={() => setEditingCourse(null)} className="px-4 py-2 text-[var(--color-text-muted)] bg-[#1e262c] rounded-lg hover:bg-gray-200 font-medium">
+                <button type="button" onClick={() => setEditingCourse(null)} className="px-4 py-2 text-[var(--color-text-muted)] bg-[#1e262c] rounded-lg hover:bg-[#2d3741] font-medium">
                   Bekor qilish
                 </button>
                 <button type="submit" className="px-4 py-2 text-white bg-[var(--color-brand-orange)] rounded-lg hover:bg-[#e06c17] font-medium">
@@ -196,13 +192,13 @@ export default function Courses() {
       {deletingId && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-[var(--color-panel-dark)] rounded-xl shadow-lg w-full max-w-sm text-center p-6">
-            <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-red-500/20 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertTriangle size={32} />
             </div>
             <h3 className="text-xl font-bold text-[var(--color-text-main)] mb-2">Ishonchingiz komilmi?</h3>
             <p className="text-[var(--color-text-muted)] mb-6">Siz bu kursni butunlay o'chirib tashlamoqchisiz. Bu amalni orqaga qaytarib bo'lmaydi.</p>
             <div className="flex gap-3 justify-center">
-              <button onClick={() => setDeletingId(null)} className="px-6 py-2 text-[var(--color-text-muted)] bg-[#1e262c] rounded-lg hover:bg-gray-200 font-medium w-full">
+              <button onClick={() => setDeletingId(null)} className="px-6 py-2 text-[var(--color-text-muted)] bg-[#1e262c] rounded-lg hover:bg-[#2d3741] font-medium w-full">
                 Yo'q, qoladi
               </button>
               <button onClick={confirmDelete} className="px-6 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 font-medium w-full">
