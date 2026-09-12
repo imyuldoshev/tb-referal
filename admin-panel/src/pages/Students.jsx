@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api';
-import { Search, Trash2, Edit2, X, Eye, AlertTriangle, Book, PlusCircle, Users, Link as LinkIcon } from 'lucide-react';
+import { Search, Trash2, Edit2, X, Eye, AlertTriangle, Book, PlusCircle, Users, Link as LinkIcon , Loader2} from 'lucide-react';
 
 export default function Students({ archiveMode = false }) {
   const [students, setStudents] = useState([]);
@@ -43,8 +43,10 @@ export default function Students({ archiveMode = false }) {
   const [newStudentData, setNewStudentData] = useState({ full_name: '', phone: '', inviter_id: '', course_id: '', status: 'pending' });
 
   const [botUsername, setBotUsername] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchData = async () => {
+    setIsLoading(true);
     try {
       const [studentsRes, coursesRes, botRes] = await Promise.all([
         api.get('/students_full'),
@@ -56,6 +58,8 @@ export default function Students({ archiveMode = false }) {
       if (botRes.data?.username) setBotUsername(botRes.data.username);
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -128,7 +132,7 @@ export default function Students({ archiveMode = false }) {
 
   const handleCopyLink = (student) => {
     if (student.telegram_id !== null) {
-      toast.success("✅ Ushbu o'quvchi allaqachon botga ulangan!");
+      toast.success("âœ… Ushbu o'quvchi allaqachon botga ulangan!");
       return;
     }
     const link = botUsername ? `https://t.me/${botUsername}?start=LINK_${student.id}` : `LINK_${student.id}`;
@@ -270,7 +274,7 @@ export default function Students({ archiveMode = false }) {
 
   return (
     <div className="space-y-4 min-[446px]:space-y-6 relative">
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 transition-all duration-300">
         <div>
           <div className="flex items-center gap-3">
 
@@ -280,11 +284,11 @@ export default function Students({ archiveMode = false }) {
           </div>
           <p className="text-xs min-[446px]:text-sm text-[var(--color-text-muted)] mt-1">{archiveMode ? "Ro'yxatdan o'tishni tugallamagan talabalar" : "Talabalar ro'yxati va ularning taklif holati"}</p>
         </div>
-        <div className="flex flex-col min-[446px]:flex-row gap-2 min-[446px]:gap-4 w-full lg:w-auto items-center">
+        <div className="flex flex-col min-[446px]:flex-row gap-2 min-[446px]:gap-4 w-full lg:w-auto items-center min-h-[42px] transition-all duration-300 relative">
           {!archiveMode && viewMode === 'manual' && (
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-[var(--color-brand-orange)] text-white rounded-lg hover:bg-[#e06c17] transition-colors w-full min-[446px]:w-auto justify-center"
+              className="flex items-center gap-2 px-4 py-2 bg-[var(--color-brand-orange)] text-white rounded-lg hover:bg-[#e06c17] transition-all duration-300 w-full min-[446px]:w-auto justify-center animate-in zoom-in-95"
             >
               <PlusCircle size={18} />
               O'quvchi qo'shish
@@ -293,7 +297,7 @@ export default function Students({ archiveMode = false }) {
           {selectedIds.length > 0 && (
             <button
               onClick={handleBulkDelete}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-300 animate-in zoom-in-95"
             >
               <Trash2 size={18} />
               Tanlanganlarni o'chirish ({selectedIds.length})
@@ -302,7 +306,7 @@ export default function Students({ archiveMode = false }) {
           {archiveMode && (
             <button
               onClick={handleClearArchive}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-300 animate-in zoom-in-95"
             >
               <Trash2 size={18} />
               Barchasini tozalash
@@ -330,7 +334,14 @@ export default function Students({ archiveMode = false }) {
         </div>
       </div>
 
-      <div className="bg-[var(--color-panel-dark)] rounded-xl shadow-sm border border-[var(--color-border-dark)] overflow-hidden w-full">
+      
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center p-12 bg-[var(--color-panel-dark)] rounded-xl border border-[var(--color-border-dark)] animate-in fade-in duration-300 w-full">
+          <Loader2 className="animate-spin text-[var(--color-brand-orange)] mb-4" size={32} />
+          <p className="text-[var(--color-text-muted)] font-medium">Ma'lumotlar yuklanmoqda...</p>
+        </div>
+      ) : (
+        <div className="bg-[var(--color-panel-dark)] rounded-xl shadow-sm border border-[var(--color-border-dark)] overflow-hidden w-full animate-in fade-in slide-in-from-bottom-2 duration-300">
         <div className="overflow-x-auto w-full">
           <table className="w-full text-left border-collapse whitespace-nowrap min-w-[700px]">
             <thead>
@@ -393,7 +404,7 @@ export default function Students({ archiveMode = false }) {
                       <td className="p-4">
                         {student.full_name === 'pending' ? (
                           <div className="mb-1">
-                            <span className="inline-flex items-center px-2 py-1 bg-amber-500/10 text-amber-500 text-xs font-semibold rounded-md border border-amber-500/30">
+                            <span className="inline-flex items-center px-2 py-1 bg-amber-500/100/10 text-amber-500 text-xs font-semibold rounded-md border border-amber-500/30">
                               Ro'yxatdan o'tish tugallanmagan
                             </span>
                           </div>
@@ -451,14 +462,14 @@ export default function Students({ archiveMode = false }) {
                         <div className="flex gap-2 justify-end">
                           <button
                               onClick={() => handleCopyLink(student)}
-                              className={`p-2 rounded transition-colors ${student.telegram_id !== null ? 'text-green-500 hover:bg-green-500/10' : 'text-[#64748b] hover:text-purple-600 hover:bg-purple-500/10'}`}
+                              className={`p-2 rounded transition-colors ${student.telegram_id !== null ? 'text-green-500 hover:bg-green-500/100/10' : 'text-[#64748b] hover:text-purple-600 hover:bg-purple-500/100/10'}`}
                               title={student.telegram_id !== null ? "Botga ulangan" : "Botga ulash havolasini nusxalash"}
                           >
                               <LinkIcon size={18} />
                           </button>
                           <button 
                             onClick={() => handleViewInvites(student)} 
-                            className="p-2 text-[#64748b] hover:text-green-600 hover:bg-green-500/10 rounded transition-colors"
+                            className="p-2 text-[#64748b] hover:text-green-600 hover:bg-green-500/100/10 rounded transition-colors"
                             title="Taklif qilgan o'quvchilarini ko'rish"
                           >
                             <Eye size={18} />
@@ -486,7 +497,7 @@ export default function Students({ archiveMode = false }) {
                                 setConfirmDialog(null);
                               }
                             })}
-                            className="p-2 text-[#64748b] hover:text-red-600 hover:bg-red-500/10 rounded transition-colors"
+                            className="p-2 text-[#64748b] hover:text-red-600 hover:bg-red-500/100/10 rounded transition-colors"
                             title="O'quvchini butunlay o'chirish"
                           >
                             <Trash2 size={18} />
@@ -501,6 +512,7 @@ export default function Students({ archiveMode = false }) {
           </table>
         </div>
       </div>
+      )}
 
       {/* --- MODALS --- */}
 
@@ -792,3 +804,4 @@ export default function Students({ archiveMode = false }) {
     </div>
   );
 }
+

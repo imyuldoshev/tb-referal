@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
-import { Users, UserPlus, BookOpen } from 'lucide-react';
+import { Users, UserPlus, BookOpen , Loader2} from 'lucide-react';
 
 function StatCard({ title, value, icon, color }) {
   return (
@@ -20,6 +20,7 @@ function StatCard({ title, value, icon, color }) {
 }
 
 export default function Dashboard() {
+  const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
     totalStudents: 0,
     activeReferrals: 0,
@@ -29,7 +30,8 @@ export default function Dashboard() {
   useEffect(() => {
     // Kichik dashboard statistikasi (Real loyihada alohida endpoint bo'lishi yaxshi)
     const fetchStats = async () => {
-      try {
+    setIsLoading(true);
+    try {
         const [studentsRes, coursesRes] = await Promise.all([
           api.get('/students'),
           api.get('/courses')
@@ -56,7 +58,14 @@ export default function Dashboard() {
         <p className="text-xs min-[446px]:text-sm text-[var(--color-text-muted)]">Tizim bo'yicha umumiy statistika</p>
       </div>
       
-      <div className="grid grid-cols-1 min-[1001px]:grid-cols-3 gap-4 min-[446px]:gap-6">
+      
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center p-12 bg-[var(--color-panel-dark)] rounded-xl border border-[var(--color-border-dark)] animate-in fade-in duration-300">
+          <Loader2 className="animate-spin text-[var(--color-brand-orange)] mb-4" size={32} />
+          <p className="text-[var(--color-text-muted)] font-medium">Statistika yuklanmoqda...</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 min-[1001px]:grid-cols-3 gap-4 min-[446px]:gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
         <StatCard 
           title="Jami O'quvchilar" 
           value={stats.totalStudents} 
@@ -76,6 +85,7 @@ export default function Dashboard() {
           color="bg-[#3b82f6]" 
         />
       </div>
+      )}
     </div>
   );
 }

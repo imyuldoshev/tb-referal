@@ -69,7 +69,7 @@ function Sidebar({ onLogout, isOpen, onClose }) {
         <div className="p-4 border-t border-[var(--color-border-dark)]">
           <button 
             onClick={onLogout}
-            className="flex w-full items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-500/100/10 rounded-lg transition-colors font-medium"
+            className="flex w-full items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-500/100/100/10 rounded-lg transition-colors font-medium"
           >
             <LogOut size={20} />
             Chiqish

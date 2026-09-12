@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import api from '../api';
-import { Plus, Edit2, Trash2, X, AlertTriangle } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, AlertTriangle , Loader2} from 'lucide-react';
 
 export default function Courses() {
   const [courses, setCourses] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newCourse, setNewCourse] = useState({ title: '', price: '' });
   
@@ -13,6 +14,7 @@ export default function Courses() {
   const [deletingId, setDeletingId] = useState(null); // Agar null bo'lmasa, Delete modal ochiladi
 
   const fetchCourses = async () => {
+    setIsLoading(true);
     try {
       const res = await api.get('/courses');
       setCourses(res.data);
@@ -38,6 +40,8 @@ export default function Courses() {
       toast.success("Kurs muvaffaqiyatli qo'shildi!");
     } catch (err) {
       toast.error("Xatolik: " + err.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -111,7 +115,14 @@ export default function Courses() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 min-[446px]:gap-6">
+      
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center p-12 bg-[var(--color-panel-dark)] rounded-xl border border-[var(--color-border-dark)] animate-in fade-in duration-300">
+          <Loader2 className="animate-spin text-[var(--color-brand-orange)] mb-4" size={32} />
+          <p className="text-[var(--color-text-muted)] font-medium">Kurslar yuklanmoqda...</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 min-[446px]:gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
         {courses.map(course => (
           <div key={course.id} className="bg-[var(--color-panel-dark)] p-4 min-[446px]:p-6 rounded-xl shadow-sm border border-[var(--color-border-dark)] hover:shadow-md transition-shadow">
             <div className="w-10 h-10 min-[446px]:w-12 min-[446px]:h-12 bg-[var(--color-brand-orange)]/20 rounded-lg flex items-center justify-center text-[var(--color-brand-orange)] font-bold text-lg min-[446px]:text-xl mb-3 min-[446px]:mb-4">
@@ -131,7 +142,7 @@ export default function Courses() {
               </button>
               <button 
                 onClick={() => setDeletingId(course.id)} 
-                className="p-2 text-[#64748b] hover:text-red-600 hover:bg-red-500/10 rounded transition-colors"
+                className="p-2 text-[#64748b] hover:text-red-600 hover:bg-red-500/100/10 rounded transition-colors"
                 title="O'chirish"
               >
                 <Trash2 size={18}/>
@@ -145,6 +156,7 @@ export default function Courses() {
           </div>
         )}
       </div>
+      )}
 
       {/* Tahrirlash (Edit) Modali */}
       {editingCourse && (
