@@ -148,6 +148,17 @@ router.post('/students/:id/enroll', async (req, res) => {
     res.json(data);
 });
 
+// DELETE /api/students_archive/clear - Arxivdagi barcha o'quvchilarni o'chirish
+router.delete('/students_archive/clear', async (req, res) => {
+    const { data, error } = await supabase
+        .from('students')
+        .delete()
+        .or('full_name.eq.pending,phone.is.null');
+        
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ success: true });
+});
+
 // DELETE /api/students/:id - O'quvchini o'chirish
 router.delete('/students/:id', async (req, res) => {
     const { id } = req.params;

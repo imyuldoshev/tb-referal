@@ -59,6 +59,17 @@ export default function Students({ archiveMode = false }) {
     }
   };
 
+  const handleClearArchive = async () => {
+    if (!window.confirm("Barcha arxivlangan o'quvchilarni butunlay o'chirib tashlaysizmi? Bu amalni ortga qaytarib bo'lmaydi!")) return;
+    
+    try {
+      await api.delete('/students_archive/clear');
+      fetchData();
+    } catch (err) {
+      alert("Xatolik: " + err.message);
+    }
+  };
+
   const handleSaveEdit = async (e) => {
     e.preventDefault();
     try {
@@ -154,6 +165,15 @@ export default function Students({ archiveMode = false }) {
           <p className="text-xs min-[446px]:text-sm text-gray-500">{archiveMode ? "Ro'yxatdan o'tishni tugallamagan talabalar" : "Talabalar ro'yxati va ularning taklif holati"}</p>
         </div>
         <div className="flex flex-col min-[446px]:flex-row gap-2 min-[446px]:gap-4 w-full lg:w-auto">
+          {archiveMode && (
+            <button
+              onClick={handleClearArchive}
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              <Trash2 size={18} />
+              Barchasini tozalash
+            </button>
+          )}
           <select 
             value={filterCourse}
             onChange={(e) => setFilterCourse(e.target.value)}
