@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
-import { Search, Trash2, Edit2, X, Eye, AlertTriangle, Book, PlusCircle } from 'lucide-react';
+import { Search, Trash2, Edit2, X, Eye, AlertTriangle, Book, PlusCircle, Users } from 'lucide-react';
 
 export default function Students({ archiveMode = false }) {
   const [students, setStudents] = useState([]);
@@ -23,6 +23,13 @@ export default function Students({ archiveMode = false }) {
   const [enrollData, setEnrollData] = useState(null); 
   // Ko'p o'chirish uchun (Bulk delete)
   const [selectedIds, setSelectedIds] = useState([]);
+  
+  // Qaysi ro'yxatni ko'rish (manual yoki bot)
+  const [viewMode, setViewMode] = useState(null);
+  
+  // Yangi o'quvchi qo'shish modali
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newStudentData, setNewStudentData] = useState({ full_name: '', phone: '' });
 
   const fetchData = async () => {
     try {
@@ -77,6 +84,18 @@ export default function Students({ archiveMode = false }) {
     try {
       await api.post('/students/bulk-delete', { ids: selectedIds });
       setSelectedIds([]);
+      fetchData();
+    } catch (err) {
+      alert("Xatolik: " + err.message);
+    }
+  };
+
+  const handleAddStudent = async (e) => {
+    e.preventDefault();
+    try {
+      await api.post('/students_manual', newStudentData);
+      setIsAddModalOpen(false);
+      setNewStudentData({ full_name: '', phone: '' });
       fetchData();
     } catch (err) {
       alert("Xatolik: " + err.message);
@@ -156,6 +175,11 @@ export default function Students({ archiveMode = false }) {
     if (archiveMode && isCompleted) return false;
     if (!archiveMode && !isCompleted) return false;
 
+    if (!archiveMode) {
+      if (viewMode === 'manual' && s.telegram_id !== null) return false;
+      if (viewMode === 'bot' && s.telegram_id === null) return false;
+    }
+
     const term = searchQuery.toLowerCase();
     const name = s.full_name?.toLowerCase() || '';
     const matchesSearch = name.includes(term);
@@ -170,14 +194,74 @@ export default function Students({ archiveMode = false }) {
     return matchesSearch && matchesCourse;
   });
 
+  if (!archiveMode && !viewMode) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">O'quvchilar</h2>
+          <p className="text-gray-500">O'quvchilar ro'yxatini ko'rish usulini tanlang</p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div 
+            onClick={() => setViewMode('manual')}
+            className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 cursor-pointer hover:border-blue-500 hover:shadow-md transition-all flex flex-col items-center justify-center text-center gap-4"
+          >
+            <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+              <PlusCircle size={32} />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-gray-900">Qo'lda qo'shilganlar</h3>
+              <p className="text-gray-500 mt-2">Siz tomoningizdan tizimga kiritilgan o'quvchilar</p>
+            </div>
+          </div>
+
+          <div 
+            onClick={() => setViewMode('bot')}
+            className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 cursor-pointer hover:border-blue-500 hover:shadow-md transition-all flex flex-col items-center justify-center text-center gap-4"
+          >
+            <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+              <Users size={32} />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-gray-900">Bot orqali kelganlar</h3>
+              <p className="text-gray-500 mt-2">Telegram botdan ro'yxatdan o'tgan o'quvchilar</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4 min-[446px]:space-y-6 relative">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
-          <h2 className="text-xl min-[446px]:text-2xl font-bold text-gray-900">{archiveMode ? "Arxiv" : "O'quvchilar va Referallar"}</h2>
-          <p className="text-xs min-[446px]:text-sm text-gray-500">{archiveMode ? "Ro'yxatdan o'tishni tugallamagan talabalar" : "Talabalar ro'yxati va ularning taklif holati"}</p>
+          <div className="flex items-center gap-3">
+            {!archiveMode && viewMode && (
+              <button 
+                onClick={() => setViewMode(null)}
+                className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            )}
+            <h2 className="text-xl min-[446px]:text-2xl font-bold text-gray-900">
+              {archiveMode ? "Arxiv" : viewMode === 'manual' ? "Qo'lda qo'shilganlar" : viewMode === 'bot' ? "Bot o'quvchilari" : "O'quvchilar va Referallar"}
+            </h2>
+          </div>
+          <p className="text-xs min-[446px]:text-sm text-gray-500 mt-1">{archiveMode ? "Ro'yxatdan o'tishni tugallamagan talabalar" : "Talabalar ro'yxati va ularning taklif holati"}</p>
         </div>
-        <div className="flex flex-col min-[446px]:flex-row gap-2 min-[446px]:gap-4 w-full lg:w-auto">
+        <div className="flex flex-col min-[446px]:flex-row gap-2 min-[446px]:gap-4 w-full lg:w-auto items-center">
+          {!archiveMode && viewMode === 'manual' && (
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-full min-[446px]:w-auto justify-center"
+            >
+              <PlusCircle size={18} />
+              O'quvchi qo'shish
+            </button>
+          )}
           {selectedIds.length > 0 && (
             <button
               onClick={handleBulkDelete}
@@ -504,6 +588,50 @@ export default function Students({ archiveMode = false }) {
                 Yopish
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Yangi o'quvchi qo'shish Modali */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-md">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+              <h3 className="text-xl font-bold text-gray-900">Yangi o'quvchi qo'shish</h3>
+              <button onClick={() => setIsAddModalOpen(false)} className="text-gray-400 hover:bg-gray-100 p-2 rounded-lg">
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleAddStudent} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Ism va Familiya</label>
+                <input 
+                  type="text" 
+                  required
+                  className="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-blue-500"
+                  value={newStudentData.full_name}
+                  onChange={(e) => setNewStudentData({...newStudentData, full_name: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Telefon raqam</label>
+                <input 
+                  type="text" 
+                  required
+                  className="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-blue-500"
+                  value={newStudentData.phone}
+                  onChange={(e) => setNewStudentData({...newStudentData, phone: e.target.value})}
+                />
+              </div>
+              <div className="pt-4 flex gap-3 justify-end">
+                <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 font-medium">
+                  Bekor qilish
+                </button>
+                <button type="submit" className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 font-medium">
+                  Qo'shish
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -187,6 +187,20 @@ router.post('/students/bulk-delete', async (req, res) => {
     res.json({ success: true });
 });
 
+// POST /api/students_manual - Qolda o'quvchi qo'shish
+router.post('/students_manual', async (req, res) => {
+    const { full_name, phone } = req.body;
+    // Qo'lda qo'shilgan o'quvchida telegram_id bo'lmaydi. Lekin referral_code majburiy.
+    const referral_code = 'MANUAL_' + Date.now();
+    const { data, error } = await supabase
+        .from('students')
+        .insert([{ full_name, phone, telegram_id: null, referral_code }])
+        .select();
+        
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+});
+
 // PATCH /api/referrals/:id - Referal statusini o'zgartirish (va kursga biriktirish)
 router.patch('/referrals/:id', async (req, res) => {
     const { id } = req.params;
