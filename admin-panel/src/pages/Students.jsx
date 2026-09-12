@@ -116,8 +116,12 @@ export default function Students({ archiveMode = false }) {
     }
   };
 
-  const handleCopyLink = (studentId) => {
-    const link = botUsername ? `https://t.me/${botUsername}?start=LINK_${studentId}` : `LINK_${studentId}`;
+  const handleCopyLink = (student) => {
+    if (student.telegram_id !== null) {
+      alert("✅ Ushbu o'quvchi allaqachon botga ulangan!");
+      return;
+    }
+    const link = botUsername ? `https://t.me/${botUsername}?start=LINK_${student.id}` : `LINK_${student.id}`;
     navigator.clipboard.writeText(link);
     alert(`O'quvchini botga ulash havolasi nusxalandi:\n${link}\n\nUshbu havolani o'quvchiga yuboring. U havolaga kirib START bossa botga ulanadi.`);
   };
@@ -441,9 +445,9 @@ export default function Students({ archiveMode = false }) {
                       <td className="p-4 text-right">
                         <div className="flex gap-2 justify-end">
                           <button
-                              onClick={() => handleCopyLink(student.id)}
-                              className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
-                              title="Botga ulash havolasini nusxalash"
+                              onClick={() => handleCopyLink(student)}
+                              className={`p-2 rounded transition-colors ${student.telegram_id !== null ? 'text-green-500 hover:bg-green-50' : 'text-gray-400 hover:text-purple-600 hover:bg-purple-50'}`}
+                              title={student.telegram_id !== null ? "Botga ulangan" : "Botga ulash havolasini nusxalash"}
                           >
                               <LinkIcon size={18} />
                           </button>
