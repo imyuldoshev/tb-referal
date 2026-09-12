@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import Dashboard from './pages/Dashboard';
 import Courses from './pages/Courses';
 import Students from './pages/Students';
@@ -130,6 +131,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <Toaster position="top-right" />
       <div className="flex bg-gray-50 min-h-screen font-sans">
         <Sidebar 
           onLogout={handleLogout} 

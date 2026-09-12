@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api';
 import { Search, Trash2, Edit2, X, Eye, AlertTriangle, Book, PlusCircle, Users, Link as LinkIcon } from 'lucide-react';
@@ -13,7 +14,7 @@ export default function Students({ archiveMode = false }) {
   const [editingStudent, setEditingStudent] = useState(null);
   
   // O'chirish (Delete) Modali
-  const [deletingId, setDeletingId] = useState(null);
+  const [confirmDialog, setConfirmDialog] = useState(null);
 
   // Ko'rish (View/Invites) Modali
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -68,40 +69,48 @@ export default function Students({ archiveMode = false }) {
       await api.patch(`/referrals/${referralId}`, { status: newStatus });
       fetchData();
     } catch (err) {
-      alert("Xatolik: " + err.message);
+      toast.error("Xatolik: " + err.message);
     }
   };
 
-  const confirmDelete = async () => {
-    try {
-      await api.delete(`/students/${deletingId}`);
-      setDeletingId(null);
-      fetchData();
-    } catch (err) {
-      alert("Xatolik: " + err.message);
-    }
+
+
+  const handleClearArchive = () => {
+    setConfirmDialog({
+      title: "Arxivni tozalash",
+      message: "Barcha arxivlangan o'quvchilarni butunlay o'chirib tashlaysizmi? Bu amalni ortga qaytarib bo'lmaydi!",
+      actionText: "Ha, tozalansin",
+      onConfirm: async () => {
+        try {
+          await api.delete('/students_archive/clear');
+          fetchData();
+          toast.success("Arxiv tozalandi!");
+        } catch (err) {
+          toast.error("Xatolik: " + err.message);
+        }
+        setConfirmDialog(null);
+      }
+    });
   };
 
-  const handleClearArchive = async () => {
-    if (!window.confirm("Barcha arxivlangan o'quvchilarni butunlay o'chirib tashlaysizmi? Bu amalni ortga qaytarib bo'lmaydi!")) return;
-    
-    try {
-      await api.delete('/students_archive/clear');
-      fetchData();
-    } catch (err) {
-      alert("Xatolik: " + err.message);
-    }
-  };
-
-  const handleBulkDelete = async () => {
-    if (!window.confirm(`Siz rostdan ham belgilangan ${selectedIds.length} ta o'quvchini o'chirmoqchimisiz?`)) return;
-    try {
-      await api.post('/students/bulk-delete', { ids: selectedIds });
-      setSelectedIds([]);
-      fetchData();
-    } catch (err) {
-      alert("Xatolik: " + err.message);
-    }
+  const handleBulkDelete = () => {
+    if (selectedIds.length === 0) return;
+    setConfirmDialog({
+      title: "O'quvchilarni o'chirish",
+      message: `Siz rostdan ham belgilangan ${selectedIds.length} ta o'quvchini o'chirmoqchimisiz?`,
+      actionText: "Ha, o'chirilsin",
+      onConfirm: async () => {
+        try {
+          await api.post('/students/bulk-delete', { ids: selectedIds });
+          setSelectedIds([]);
+          fetchData();
+          toast.success("O'quvchilar o'chirildi!");
+        } catch (err) {
+          toast.error("Xatolik: " + err.message);
+        }
+        setConfirmDialog(null);
+      }
+    });
   };
 
   const handleAddStudent = async (e) => {
@@ -111,19 +120,20 @@ export default function Students({ archiveMode = false }) {
       setIsAddModalOpen(false);
       setNewStudentData({ full_name: '', phone: '', inviter_id: '', course_id: '', status: 'pending' });
       fetchData();
+      toast.success("O'quvchi qo'shildi!");
     } catch (err) {
-      alert("Xatolik: " + err.message);
+      toast.error("Xatolik: " + err.message);
     }
   };
 
   const handleCopyLink = (student) => {
     if (student.telegram_id !== null) {
-      alert("✅ Ushbu o'quvchi allaqachon botga ulangan!");
+      toast.success("✅ Ushbu o'quvchi allaqachon botga ulangan!");
       return;
     }
     const link = botUsername ? `https://t.me/${botUsername}?start=LINK_${student.id}` : `LINK_${student.id}`;
     navigator.clipboard.writeText(link);
-    alert(`O'quvchini botga ulash havolasi nusxalandi:\n${link}\n\nUshbu havolani o'quvchiga yuboring. U havolaga kirib START bossa botga ulanadi.`);
+    toast.success(`O'quvchini botga ulash havolasi nusxalandi!`);
   };
 
   const handleSaveEdit = async (e) => {
@@ -136,7 +146,7 @@ export default function Students({ archiveMode = false }) {
       setEditingStudent(null);
       fetchData();
     } catch (err) {
-      alert("Xatolik: " + err.message);
+      toast.error("Xatolik: " + err.message);
     }
   };
 
@@ -147,7 +157,7 @@ export default function Students({ archiveMode = false }) {
       setInvitedList(res.data);
       setIsViewModalOpen(true);
     } catch (err) {
-      alert("Taklif qilinganlarni yuklashda xatolik: " + err.message);
+      toast.error("Taklif qilinganlarni yuklashda xatolik: " + err.message);
     }
   };
 
@@ -177,7 +187,7 @@ export default function Students({ archiveMode = false }) {
         finalPrice
       });
     } catch (err) {
-      alert("Skidkani hisoblashda xatolik: " + err.message);
+      toast.error("Skidkani hisoblashda xatolik: " + err.message);
     }
   };
 
@@ -187,7 +197,7 @@ export default function Students({ archiveMode = false }) {
       setEnrollData(null);
       fetchData();
     } catch (err) {
-      alert(err.response?.data?.error || "Xatolik: " + err.message);
+      toast.error(err.response?.data?.error || "Xatolik: " + err.message);
       setEnrollData(null); // xato bo'lsa ham modalni yopamiz (masalan allaqachon qo'shilgan bo'lsa)
     }
   };
@@ -466,7 +476,21 @@ export default function Students({ archiveMode = false }) {
                             <Edit2 size={18} />
                           </button>
                           <button 
-                            onClick={() => setDeletingId(student.id)} 
+                            onClick={() => setConfirmDialog({
+                              title: "Ishonchingiz komilmi?",
+                              message: "Siz bu o'quvchini va u bilan bog'liq hamma takliflarni butunlay o'chirib tashlamoqchisiz.",
+                              actionText: "Ha, o'chirilsin",
+                              onConfirm: async () => {
+                                try {
+                                  await api.delete(`/students/${student.id}`);
+                                  fetchData();
+                                  toast.success("O'quvchi o'chirildi!");
+                                } catch (err) {
+                                  toast.error("Xatolik: " + err.message);
+                                }
+                                setConfirmDialog(null);
+                              }
+                            })}
                             className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                             title="O'quvchini butunlay o'chirish"
                           >
@@ -758,20 +782,20 @@ export default function Students({ archiveMode = false }) {
       )}
 
       {/* O'chirish (Delete) Modali */}
-      {deletingId && (
+      {confirmDialog && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-lg w-full max-w-sm text-center p-6">
             <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertTriangle size={32} />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Ishonchingiz komilmi?</h3>
-            <p className="text-gray-500 mb-6">Siz bu o'quvchini va u bilan bog'liq hamma takliflarni butunlay o'chirib tashlamoqchisiz.</p>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">{confirmDialog.title}</h3>
+            <p className="text-gray-500 mb-6">{confirmDialog.message}</p>
             <div className="flex gap-3 justify-center">
-              <button onClick={() => setDeletingId(null)} className="px-6 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 font-medium w-full">
-                Yo'q, qoladi
+              <button onClick={() => setConfirmDialog(null)} className="px-6 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 font-medium w-full">
+                Yo'q
               </button>
-              <button onClick={confirmDelete} className="px-6 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 font-medium w-full">
-                Ha, o'chirilsin
+              <button onClick={confirmDialog.onConfirm} className="px-6 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 font-medium w-full">
+                {confirmDialog.actionText}
               </button>
             </div>
           </div>

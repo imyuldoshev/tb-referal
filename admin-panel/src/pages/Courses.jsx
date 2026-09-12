@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import api from '../api';
 import { Plus, Edit2, Trash2, X, AlertTriangle } from 'lucide-react';
 
@@ -34,8 +35,9 @@ export default function Courses() {
       setNewCourse({ title: '', price: '' });
       setShowAddForm(false);
       fetchCourses();
+      toast.success("Kurs muvaffaqiyatli qo'shildi!");
     } catch (err) {
-      alert("Xatolik: " + err.message);
+      toast.error("Xatolik: " + err.message);
     }
   };
 
@@ -48,8 +50,9 @@ export default function Courses() {
       });
       setEditingCourse(null);
       fetchCourses();
+      toast.success("Kurs muvaffaqiyatli yangilandi!");
     } catch (err) {
-      alert("Xatolik: " + err.message);
+      toast.error("Xatolik: " + err.message);
     }
   };
 
@@ -58,8 +61,9 @@ export default function Courses() {
       await api.delete(`/courses/${deletingId}`);
       setDeletingId(null);
       fetchCourses();
+      toast.success("Kurs o'chirildi!");
     } catch (err) {
-      alert("Xatolik: " + err.message);
+      toast.error("Xatolik: " + err.message);
     }
   };
 
