@@ -417,7 +417,9 @@ export default function Students({ archiveMode = false }) {
                         {refInfo ? (
                            <p className="font-medium text-blue-600">{refInfo.inviter?.full_name}</p>
                         ) : (
-                           <span className="text-gray-400 italic text-sm">O'zi kelgan</span>
+                           <span className="text-gray-400 italic text-sm">
+                             {student.referral_code?.startsWith('MANUAL_') ? "Qo'lda qo'shilgan" : "O'zi kelgan"}
+                           </span>
                         )}
                       </td>
                       <td className="p-4">
