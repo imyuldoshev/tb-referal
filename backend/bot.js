@@ -6,7 +6,7 @@ const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN);
 
 const showMainMenu = async (ctx) => {
     const keyboard = new Keyboard()
-        .text("👤 Mening hisobim").text("🔗 Referal havolam").row()
+        .text("👤 Mening hisobim").row()
         .text("👥 Mening takliflarim").text("❓ Qoidalar").resized();
         
     await ctx.reply("Quyidagi menyulardan birini tanlang:", {
@@ -193,23 +193,6 @@ bot.hears('👤 Mening hisobim', async (ctx) => {
         await ctx.reply(msg, { parse_mode: "Markdown" });
     } catch (err) {
         console.error(err);
-        await ctx.reply("Xatolik yuz berdi.");
-    }
-});
-
-bot.hears('🔗 Referal havolam', async (ctx) => {
-    const telegramId = ctx.from.id;
-    try {
-        const { data: student } = await supabase.from('students').select('referral_code').eq('telegram_id', telegramId).single();
-        if (student) {
-            const botInfo = await bot.api.getMe();
-            const refLink = `https://t.me/${botInfo.username}?start=${student.referral_code}`;
-            const msg = `🔗 **Sizning shaxsiy referal havolangiz:**\n\n${refLink}\n\nUshbu havolani do'stlaringizga yuboring va ular o'qishni boshlaganda kurs narxidan 5% chegirma oling!`;
-            await ctx.reply(msg);
-        } else {
-            await ctx.reply("Foydalanuvchi topilmadi. Iltimos /start buyrug'ini bosing.");
-        }
-    } catch (err) {
         await ctx.reply("Xatolik yuz berdi.");
     }
 });
