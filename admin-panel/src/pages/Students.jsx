@@ -39,7 +39,7 @@ export default function Students({ archiveMode = false }) {
   
   // Yangi o'quvchi qo'shish modali
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [newStudentData, setNewStudentData] = useState({ full_name: '', phone: '' });
+  const [newStudentData, setNewStudentData] = useState({ full_name: '', phone: '', inviter_id: '', course_id: '', status: 'pending' });
 
   const fetchData = async () => {
     try {
@@ -105,7 +105,7 @@ export default function Students({ archiveMode = false }) {
     try {
       await api.post('/students_manual', newStudentData);
       setIsAddModalOpen(false);
-      setNewStudentData({ full_name: '', phone: '' });
+      setNewStudentData({ full_name: '', phone: '', inviter_id: '', course_id: '', status: 'pending' });
       fetchData();
     } catch (err) {
       alert("Xatolik: " + err.message);
@@ -625,6 +625,56 @@ export default function Students({ archiveMode = false }) {
                   value={newStudentData.phone}
                   onChange={(e) => setNewStudentData({...newStudentData, phone: e.target.value})}
                 />
+              </div>
+              
+              <div className="pt-2 border-t border-gray-200 mt-2">
+                <p className="text-sm font-semibold text-gray-700 mb-2">Referal ma'lumotlari (Ixtiyoriy)</p>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Kim taklif qildi?</label>
+                    <select 
+                      className="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-blue-500 text-sm"
+                      value={newStudentData.inviter_id}
+                      onChange={(e) => setNewStudentData({...newStudentData, inviter_id: e.target.value})}
+                    >
+                      <option value="">-- Tanlanmagan --</option>
+                      {students.map(s => (
+                        <option key={s.id} value={s.id}>{s.full_name} ({s.phone || 'Nomsiz'})</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  {newStudentData.inviter_id && (
+                    <>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">Qaysi kursga taklif qildi?</label>
+                        <select 
+                          className="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-blue-500 text-sm"
+                          value={newStudentData.course_id}
+                          onChange={(e) => setNewStudentData({...newStudentData, course_id: e.target.value})}
+                          required={!!newStudentData.inviter_id}
+                        >
+                          <option value="">-- Kursni tanlang --</option>
+                          {courses.map(c => (
+                            <option key={c.id} value={c.id}>{c.title}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">Referal holati</label>
+                        <select 
+                          className="w-full border border-gray-300 rounded-lg p-2 outline-none focus:border-blue-500 text-sm"
+                          value={newStudentData.status}
+                          onChange={(e) => setNewStudentData({...newStudentData, status: e.target.value})}
+                        >
+                          <option value="pending">Kutishda (Pending)</option>
+                          <option value="active">Faol (Active - chegirma beriladi)</option>
+                          <option value="left">Ketgan (Left)</option>
+                        </select>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
               <div className="pt-4 flex gap-3 justify-end">
                 <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 font-medium">

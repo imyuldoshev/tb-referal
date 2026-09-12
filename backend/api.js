@@ -189,16 +189,31 @@ router.post('/students/bulk-delete', async (req, res) => {
 
 // POST /api/students_manual - Qolda o'quvchi qo'shish
 router.post('/students_manual', async (req, res) => {
-    const { full_name, phone } = req.body;
+    const { full_name, phone, inviter_id, course_id, status } = req.body;
     // Qo'lda qo'shilgan o'quvchida telegram_id bo'lmaydi. Lekin referral_code majburiy.
     const referral_code = 'MANUAL_' + Date.now();
-    const { data, error } = await supabase
+    const { data: newStudent, error } = await supabase
         .from('students')
         .insert([{ full_name, phone, telegram_id: null, referral_code }])
-        .select();
+        .select()
+        .single();
         
     if (error) return res.status(500).json({ error: error.message });
-    res.json(data);
+
+    // Agar taklif qiluvchi va kurs tanlangan bo'lsa
+    if (inviter_id && course_id) {
+        const refStatus = status || 'pending';
+        await supabase
+            .from('referrals')
+            .insert([{
+                inviter_id,
+                referee_id: newStudent.id,
+                course_id,
+                status: refStatus
+            }]);
+    }
+
+    res.json(newStudent);
 });
 
 // PATCH /api/referrals/:id - Referal statusini o'zgartirish (va kursga biriktirish)
