@@ -171,6 +171,22 @@ router.delete('/students/:id', async (req, res) => {
     res.json({ success: true });
 });
 
+// POST /api/students/bulk-delete - Ko'p o'quvchilarni o'chirish
+router.post('/students/bulk-delete', async (req, res) => {
+    const { ids } = req.body;
+    if (!ids || !Array.isArray(ids)) {
+        return res.status(400).json({ error: "Invalid or no ids provided" });
+    }
+    
+    const { data, error } = await supabase
+        .from('students')
+        .delete()
+        .in('id', ids);
+        
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ success: true });
+});
+
 // PATCH /api/referrals/:id - Referal statusini o'zgartirish (va kursga biriktirish)
 router.patch('/referrals/:id', async (req, res) => {
     const { id } = req.params;

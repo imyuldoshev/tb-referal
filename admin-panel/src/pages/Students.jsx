@@ -21,6 +21,8 @@ export default function Students({ archiveMode = false }) {
 
   // Kursga qo'shish (Enroll) Modali
   const [enrollData, setEnrollData] = useState(null); 
+  // Ko'p o'chirish uchun (Bulk delete)
+  const [selectedIds, setSelectedIds] = useState([]);
 
   const fetchData = async () => {
     try {
@@ -64,6 +66,17 @@ export default function Students({ archiveMode = false }) {
     
     try {
       await api.delete('/students_archive/clear');
+      fetchData();
+    } catch (err) {
+      alert("Xatolik: " + err.message);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!window.confirm(`Siz rostdan ham belgilangan ${selectedIds.length} ta o'quvchini o'chirmoqchimisiz?`)) return;
+    try {
+      await api.post('/students/bulk-delete', { ids: selectedIds });
+      setSelectedIds([]);
       fetchData();
     } catch (err) {
       alert("Xatolik: " + err.message);
@@ -165,6 +178,15 @@ export default function Students({ archiveMode = false }) {
           <p className="text-xs min-[446px]:text-sm text-gray-500">{archiveMode ? "Ro'yxatdan o'tishni tugallamagan talabalar" : "Talabalar ro'yxati va ularning taklif holati"}</p>
         </div>
         <div className="flex flex-col min-[446px]:flex-row gap-2 min-[446px]:gap-4 w-full lg:w-auto">
+          {selectedIds.length > 0 && (
+            <button
+              onClick={handleBulkDelete}
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              <Trash2 size={18} />
+              Tanlanganlarni o'chirish ({selectedIds.length})
+            </button>
+          )}
           {archiveMode && (
             <button
               onClick={handleClearArchive}
@@ -202,6 +224,20 @@ export default function Students({ archiveMode = false }) {
           <table className="w-full text-left border-collapse whitespace-nowrap min-w-[700px]">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="p-4 font-medium text-gray-600 w-12">
+                  <input 
+                    type="checkbox" 
+                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                    checked={filteredStudents.length > 0 && selectedIds.length === filteredStudents.length}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedIds(filteredStudents.map(s => s.id));
+                      } else {
+                        setSelectedIds([]);
+                      }
+                    }}
+                  />
+                </th>
                 <th className="p-4 font-medium text-gray-600">O'quvchi</th>
                 <th className="p-4 font-medium text-gray-600">O'qiyotgan Kursi</th>
                 <th className="p-4 font-medium text-gray-600">Taklif qildi (Inviter)</th>
@@ -211,7 +247,7 @@ export default function Students({ archiveMode = false }) {
             </thead>
             <tbody>
               {filteredStudents.length === 0 ? (
-                <tr><td colSpan="5" className="p-8 text-center text-gray-500">Hech qanday ma'lumot topilmadi</td></tr>
+                <tr><td colSpan="6" className="p-8 text-center text-gray-500">Hech qanday ma'lumot topilmadi</td></tr>
               ) : (
                 filteredStudents.map(student => {
                   const refInfo = student.referral_info && student.referral_info.length > 0 
@@ -231,6 +267,20 @@ export default function Students({ archiveMode = false }) {
 
                   return (
                     <tr key={student.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
+                      <td className="p-4">
+                        <input 
+                          type="checkbox" 
+                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                          checked={selectedIds.includes(student.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedIds([...selectedIds, student.id]);
+                            } else {
+                              setSelectedIds(selectedIds.filter(id => id !== student.id));
+                            }
+                          }}
+                        />
+                      </td>
                       <td className="p-4">
                         {student.full_name === 'pending' ? (
                           <div className="mb-1">
