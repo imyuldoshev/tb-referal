@@ -196,8 +196,8 @@ export default function Students({ archiveMode = false }) {
     if (!archiveMode && !isCompleted) return false;
 
     if (!archiveMode) {
-      if (viewMode === 'manual' && s.telegram_id !== null) return false;
-      if (viewMode === 'bot' && s.telegram_id === null) return false;
+      if (viewMode === 'manual' && !(s.referral_code && s.referral_code.startsWith('MANUAL_'))) return false;
+      if (viewMode === 'bot' && s.referral_code && s.referral_code.startsWith('MANUAL_')) return false;
     }
 
     const term = searchQuery.toLowerCase();

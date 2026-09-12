@@ -211,6 +211,34 @@ router.post('/students_manual', async (req, res) => {
                 course_id,
                 status: refStatus
             }]);
+            
+        if (refStatus === 'active') {
+            const { data: inviterData } = await supabase.from('students').select('telegram_id').eq('id', inviter_id).single();
+            if (inviterData && inviterData.telegram_id) {
+                try {
+                    const { data: activeReferrals } = await supabase
+                        .from('referrals')
+                        .select('id')
+                        .eq('inviter_id', inviter_id)
+                        .eq('status', 'active');
+                        
+                    const activeCount = activeReferrals ? activeReferrals.length : 1;
+                    let totalDiscount = activeCount * 5;
+                    if (totalDiscount > 100) totalDiscount = 100;
+
+                    await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: inviterData.telegram_id,
+                            text: `🎉 Tabriklaymiz! Siz taklif qilgan ${newStudent.full_name} o'qishni boshladi.\n\nSizning jami chegirmangiz ${totalDiscount}% ga yetdi! (${activeCount} ta faol o'quvchi)`
+                        })
+                    });
+                } catch (e) {
+                    console.error('Bot orqali xabar yuborishda xatolik:', e);
+                }
+            }
+        }
     }
 
     res.json(newStudent);
