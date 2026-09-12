@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import api from '../api';
 import { Search, Trash2, Edit2, X, Eye, AlertTriangle, Book, PlusCircle, Users } from 'lucide-react';
 
@@ -25,7 +26,16 @@ export default function Students({ archiveMode = false }) {
   const [selectedIds, setSelectedIds] = useState([]);
   
   // Qaysi ro'yxatni ko'rish (manual yoki bot)
-  const [viewMode, setViewMode] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const viewMode = searchParams.get('view');
+  
+  const setViewMode = (mode) => {
+    if (mode) {
+      setSearchParams({ view: mode });
+    } else {
+      setSearchParams({});
+    }
+  };
   
   // Yangi o'quvchi qo'shish modali
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -238,14 +248,7 @@ export default function Students({ archiveMode = false }) {
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
           <div className="flex items-center gap-3">
-            {!archiveMode && viewMode && (
-              <button 
-                onClick={() => setViewMode(null)}
-                className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                <X size={20} />
-              </button>
-            )}
+
             <h2 className="text-xl min-[446px]:text-2xl font-bold text-gray-900">
               {archiveMode ? "Arxiv" : viewMode === 'manual' ? "Qo'lda qo'shilganlar" : viewMode === 'bot' ? "Bot o'quvchilari" : "O'quvchilar va Referallar"}
             </h2>
